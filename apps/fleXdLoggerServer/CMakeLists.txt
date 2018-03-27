@@ -30,12 +30,12 @@ SET(publicHeaders
 )
 
 SET(privateHeaders
-    inc/public/AppArray.h
-    inc/public/Application.h
-    inc/public/iSocServer.h
-    inc/public/Logger.h
-    inc/public/LogMessage.h
-    inc/public/MessageType.h
+    inc/AppArray.h
+    inc/Application.h
+    inc/iSocServer.h
+    inc/Logger.h
+    inc/LogMessage.h
+    inc/MessageType.h
 )
 
 SET(privateSources
