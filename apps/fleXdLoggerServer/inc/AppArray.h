@@ -30,25 +30,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef APPARRAY_H
 #define APPARRAY_H
-#include <list>
+
+#include <vector>
+#include <memory>
 #include "Application.h"
 namespace flexd {
     namespace FlexLogger {
 
         class AppArray {
+            typedef std::array<std::unique_ptr<Application>, 65536> appVec;
         public:
             AppArray();
             virtual ~AppArray();
-            uint16_t insertToArray(std::string appName, int p_descriptor);              
-            bool removeFromArray(int p_descriptor);
-            Application getApp(uint16_t p_appID);
+            int insertToArray(const std::string& appName, int descriptor);              
+            bool removeFromArray(int descriptor);
+            std::string getAppName(uint16_t appID) const;
+            
             
             AppArray(const AppArray& orig) = delete;
         private:
             bool compareDescription(Application);
         private:
-            uint16_t m_IDCounter;
-            std::list<Application> m_list;
+            appVec m_list;
+            appVec::iterator m_pos;
+            
             
 
         };

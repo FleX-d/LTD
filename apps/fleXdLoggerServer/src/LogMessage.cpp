@@ -42,12 +42,12 @@ namespace flexd {
         : BiteStream(std::move(data)) {
         }
 
-        LogMessage::LogMessage(uint16_t appID, uint8_t pMsgType, uint8_t msgCounter, std::string logMessage) {
+        LogMessage::LogMessage(uint16_t appID, uint8_t msgType, uint8_t msgCounter, std::string logMessage) {
             const std::time_t time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
             uint16_t sizeOfPayload = logMessage.length();
             this->put(appID, 16);
             this->put(time, 64);
-            this->put(pMsgType, 8);
+            this->put(msgType, 8);
             this->put(msgCounter, 8);
             this->put(sizeOfPayload, 16);
             this->put(logMessage.begin(), logMessage.end());
@@ -97,6 +97,7 @@ namespace flexd {
                     priority.c_str(),
                     getLogMessage().c_str()
                     );
+            return true;
         }
 
         uint16_t LogMessage::getAppID() {

@@ -48,7 +48,7 @@ buffer()
 {
 }
 
-bool iSocServer::connectFunck(int pPort) {
+bool iSocServer::connectFunck(int port) {
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         perror("socket failed");
@@ -63,7 +63,7 @@ bool iSocServer::connectFunck(int pPort) {
     }
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(pPort);
+    address.sin_port = htons(port);
 
     // Forcefully attaching socket to the port 8080
     if (bind(server_fd, (struct sockaddr *) &address,
@@ -95,8 +95,8 @@ int iSocServer::connectClient() {
     return socket;
 }
 
-int iSocServer::recv(int pDescriptor, void* pBuffer, uint16_t pSize) {
-    valread = read(pDescriptor, pBuffer, pSize);
+int iSocServer::recv(int descriptor, void* buffer, uint16_t size) {
+    valread = read(descriptor, buffer, size);
     if (valread < 0) {
         std::perror("ERROR:");
         return valread;
@@ -104,8 +104,8 @@ int iSocServer::recv(int pDescriptor, void* pBuffer, uint16_t pSize) {
     return valread;
 }
 
-bool iSocServer::send(int pDescriptor, void* pBuffer, uint16_t pSize) {
-    valread =write(pDescriptor, pBuffer, pSize);
+bool iSocServer::send(int descriptor, void* buffer, uint16_t size) {
+    valread =write(descriptor, buffer, size);
     if (valread < 0) {
         std::perror("ERROR:");
         return valread;

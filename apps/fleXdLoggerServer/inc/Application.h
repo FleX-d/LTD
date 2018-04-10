@@ -41,18 +41,15 @@ namespace flexd {
         class Application {
 
         public:
-            Application(std::string appName, uint16_t p_appID, int p_appDescriptor);
+            Application(const std::string& appName, int appDescriptor);
             Application(const Application& orig);
             virtual ~Application();
-            uint16_t getAppID();
-            std::string getAppName();
-            int getAppDescriptor();
-            bool compareName(std::string& p_name);
-            bool operator == (const Application& lhs)const{ return this->m_appFileDesc == lhs.m_appFileDesc &&
-                    this->m_appID == lhs.m_appID;}
+            std::string getAppName()const;
+            int getAppDescriptor()const;
+            bool compareName(const std::string& name);
+            bool operator == (const Application& lhs)const{ return this->m_appFileDesc == lhs.m_appFileDesc ;}
             
         private:
-            uint16_t m_appID;
             std::string m_appName;
             int m_appFileDesc;
         };

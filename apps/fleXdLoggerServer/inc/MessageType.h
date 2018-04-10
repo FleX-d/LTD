@@ -42,7 +42,11 @@ namespace flexd {
             WARN = 4,
             ERROR = 5,
             FATAL = 6,
-            ALL = 7
+            ALL = 7,
+            
+            SYSMSG_OK_NAME = 253,
+            SYSMSG_FALSE_NAME = 254,
+            DEFAULT = 255
                     // TODO other types of message
         };
     } // namespace FlexLogger

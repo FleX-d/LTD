@@ -34,26 +34,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace flexd {
     namespace FlexLogger {
 
-        Application::Application(std::string appName, uint16_t p_appID, int p_appDescriptor)
-        : m_appName(appName),
-          m_appID(p_appID),      
-          m_appFileDesc(p_appDescriptor) {
+        Application::Application(const std::string& appName, int appDescriptor)
+        : m_appName(appName),      
+          m_appFileDesc(appDescriptor) {
         }
 
-        uint16_t Application::getAppID() {
-            return m_appID;
-        }
-
-        std::string Application::getAppName() {
+        std::string Application::getAppName() const{
             return m_appName;
         }
 
-        int Application::getAppDescriptor() {
+        int Application::getAppDescriptor() const{
             return m_appFileDesc;
         }
 
-        bool Application::compareName(std::string& p_name) {
-            if(m_appName == p_name){
+        bool Application::compareName(const std::string& name) {
+            if(m_appName == name){
                 return true;
             } else {
                 return false;
@@ -62,7 +57,6 @@ namespace flexd {
 
         Application::Application(const Application& orig) {
             this->m_appFileDesc =orig.m_appFileDesc;
-            this->m_appID = orig.m_appID;
             this->m_appName = orig.m_appName;
         }
 

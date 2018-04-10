@@ -43,7 +43,7 @@ namespace flexd {
         class LogMessage : public BiteStream{
         public:
             LogMessage(std::vector<uint8_t>&& data);
-            LogMessage(uint16_t appID, uint8_t pMsgType, uint8_t msgCounter, std::string logMessage);
+            LogMessage(uint16_t appID, uint8_t msgType, uint8_t msgCounter, std::string logMessage);
             ~LogMessage() = default;
 
             void logToCout();

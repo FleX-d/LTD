@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int main(int argc, char** argv) {
     flexd::FlexLogger::Logger logger;
-    bool bol = logger.loggingFunc();
+    logger.loggingFunc();
     
     return 0;
 }

@@ -55,11 +55,11 @@ public:
     iSocServer();
     iSocServer(const iSocServer& orig) = delete;
     ~iSocServer();
-    bool connectFunck(int pPort);
+    bool connectFunck(int port);
     bool listenServer();
     int connectClient();
-    bool send(int pDescriptor, void* pBuffer, uint16_t pSize);
-    int recv(int pDescriptor, void* pBuffer, uint16_t pSize);
+    bool send(int descriptor, void* buffer, uint16_t size);
+    int recv(int descriptor, void* buffer, uint16_t size);
     void printSocketfd();
     
 private:

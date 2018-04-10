@@ -50,11 +50,11 @@ namespace flexd {
             char buffer[1024];
             std::vector<uint8_t> dataBuffer();
             uint16_t appId;
-
+            
+            openlog("LOGGER", LOG_CONS, LOG_LOCAL0);
             while (1) {
                 //Connecting of client app        
                 client = m_socServer->connectClient();
-                openlog("LOGGER", LOG_CONS, LOG_LOCAL0);
                 std::cout << "Client connected " << std::endl;
 
                 /*Handshake and generate of appID*/
@@ -62,19 +62,19 @@ namespace flexd {
                 std::vector<uint8_t> dataBuffer(buffer, buffer + valread);
                 if (valread) {
                     LogMessage initmessage(std::move(dataBuffer)); //create log init message
-                    appName = initmessage.getLogMessage();
+                    //appName = initmessage.getLogMessage();
                     appId = m_arrayOfApp.insertToArray(appName, client);
 
                     if (appId != 0) {
-                        std::cout << "*InitMessage* Appname: " << appName << std::endl;
-                        LogMessage ackMessage(appId, (uint8_t) MsgType::ERROR, initmessage.getMsgCounter() + 1, std::to_string(appId));
+                        //std::cout << "*InitMessage* Appname: " << m_arrayOfApp.getApp(appId).getAppName() << std::endl;
+                        LogMessage ackMessage(appId, (uint8_t) MsgType::SYSMSG_OK_NAME, initmessage.getMsgCounter() + 1, std::to_string(appId));
                         std::cout << "*ACKMESSAGE*-> ";
                         ackMessage.logToCout();
                         std::vector<uint8_t> streamVector = ackMessage.releaseData();
                         m_socServer->send(client, streamVector.data(), streamVector.size());
                     } else {
                         std::cout << "************This application name using other client*************" << std::endl;
-                        LogMessage ackMessage(appId, (uint8_t) MsgType::FATAL, initmessage.getMsgCounter() + 1, std::string("Error"));
+                        LogMessage ackMessage(appId, (uint8_t) MsgType::SYSMSG_FALSE_NAME, initmessage.getMsgCounter() + 1, std::string("Error"));
                         std::cout << "*ACKMESSAGE*-> ";
                         ackMessage.logToCout();
                         std::vector<uint8_t> streamVector = ackMessage.releaseData();
@@ -94,21 +94,22 @@ namespace flexd {
                         LogMessage message(std::move(dataBuffer));
 
                         message.logToCout();
-                        message.logToSysLog(appName);
+                        //message.logToSysLog(m_arrayOfApp.getApp(message.getAppID()).getAppName());
                         //logToSysLog(message);
 
 
                     } else {
                         //TODO remove application from map
-                        //m_arrayOfApp.removeFromArray(client);
+                        m_arrayOfApp.removeFromArray(client);
                         close(client);
 
                         break;
                     }
                 }
 
-                closelog();
+                
             }
+            closelog();
         }/*
 bool Logger::logToSysLog(LogMessage& message) {
     std::string priority;
