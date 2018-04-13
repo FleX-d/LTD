@@ -11,4 +11,24 @@ All notable changes to this project will be documented in this file.
 - None
 
 ### Removed
-- None
+- None 
+
+## [0.0.1] - 2018-04-10
+### Added
+- . Adding functionality for secure, non duplicated names of client   [Jakub Pekar]
+
+### Changed
+- Implementation vector of unique_ptr for register clients on the server instead of list [Jakub Pekar]
+
+### Removed
+- None 
+
+## [0.0.1] - 2018-04-13
+### Added
+- Creating own libraries MessageType for sharing an enum between client and server application and adding Cmake for that[Jakub Pekar]
+
+### Changed
+- 
+
+### Removed
+- MessageType from server. 
