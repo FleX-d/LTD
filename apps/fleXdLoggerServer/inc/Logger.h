@@ -79,7 +79,7 @@ LOG_DEBUG  7
 #include <syslog.h>
 #include "iSocServer.h"
 #include "LogMessage.h"
-#include "MessageType.h"
+#include <MessageType.h>
 #include "AppArray.h"
 
 namespace flexd {

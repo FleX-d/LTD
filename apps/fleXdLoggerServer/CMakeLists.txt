@@ -6,6 +6,8 @@ message(STATUS "***" )
 message(STATUS "*  " ${PROJECT_NAME})
 message(STATUS "***" )
 
+include_directories(${fleXdMessageTypePublicInc})
+
 include(ExternalProject)
 find_package(Git REQUIRED)
 
@@ -35,7 +37,6 @@ SET(privateHeaders
     inc/iSocServer.h
     inc/Logger.h
     inc/LogMessage.h
-    inc/MessageType.h
 )
 
 SET(privateSources

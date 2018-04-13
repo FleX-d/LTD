@@ -68,6 +68,7 @@ namespace flexd {
                     }
                 }
             }
+            return -1;
         }
 
         std::string AppArray::getAppName(uint16_t appID) const {

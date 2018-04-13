@@ -31,7 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef LOGMESSAGE_H
 #define LOGMESSAGE_H
 
-//#include "BitStream.h"
 #include <BiteStream.h>
 #include <iostream>
 #include <thread>

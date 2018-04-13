@@ -43,7 +43,7 @@ namespace flexd {
         }
 
         LogMessage::LogMessage(uint16_t appID, uint8_t msgType, uint8_t msgCounter, std::string logMessage) {
-            const std::time_t time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+            const std::time_t time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
             uint16_t sizeOfPayload = logMessage.length();
             this->put(appID, 16);
             this->put(time, 64);
@@ -91,10 +91,13 @@ namespace flexd {
                 case 7:priority = "ALL";
                     //sysLogType = 1;
                     break;
+                default:
+                    priority = "*unknow*";
+                    break;
             }
             syslog(sysLogType, "[%s][%ld][%s] %s ", name.c_str(), \
                     getTime(),\
-                    priority.c_str(),
+                    priority.c_str(),\
                     getLogMessage().c_str()
                     );
             return true;
