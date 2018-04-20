@@ -31,4 +31,15 @@ All notable changes to this project will be documented in this file.
 - 
 
 ### Removed
-- MessageType from server. 
+- MessageType from server.
+
+## [0.0.1] - 2018-04-20
+### Added
+- Creating Connector class which will be implementation of IPC on LoggerServer[Jakub Pekar]
+- Adding functions to Logger object for future connection on th DLT Logger.
+
+### Changed
+- Dividing complicated large functions into small functions
+
+### Removed
+- Makefile which was unknowingly pushed to GitHub

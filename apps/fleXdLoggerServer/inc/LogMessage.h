@@ -39,15 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace flexd {
     namespace FlexLogger {
-        class LogMessage : public BiteStream{
+        class LogMessage : public BiteStream {
         public:
             LogMessage(std::vector<uint8_t>&& data);
             LogMessage(uint16_t appID, uint8_t msgType, uint8_t msgCounter, std::string logMessage);
             ~LogMessage() = default;
 
             void logToCout();
-            bool logToSysLog(std::string appName);
-
             uint16_t getAppID();
             uint64_t getTime();
             uint8_t getMsgType();

@@ -63,69 +63,30 @@ namespace flexd {
                     << std::endl;
         }
 
-        bool LogMessage::logToSysLog(std::string name) {
-            std::string priority;
-            uint8_t sysLogType = 4;
-            switch (getMsgType()) {
-                case 0:priority = "HANDSHAKE";
-                    //sysLogType = 6;
-                    break;
-                case 1:priority = "VERBOSE";
-                    //sysLogType = 6;
-                    break;
-                case 2:priority = "DEBUG";
-                    // sysLogType = 7;
-                    break;
-                case 3:priority = "INFO";
-                    //sysLogType = 6;
-                    break;
-                case 4:priority = "WARN";
-                    //sysLogType = 5;
-                    break;
-                case 5:priority = "ERROR";
-                    //sysLogType = 3;
-                    break;
-                case 6:priority = "FATAL";
-                    //sysLogType = 2;
-                    break;
-                case 7:priority = "ALL";
-                    //sysLogType = 1;
-                    break;
-                default:
-                    priority = "*unknow*";
-                    break;
-            }
-            syslog(sysLogType, "[%s][%ld][%s] %s ", name.c_str(), \
-                    getTime(),\
-                    priority.c_str(),\
-                    getLogMessage().c_str()
-                    );
-            return true;
-        }
-
-        uint16_t LogMessage::getAppID() {
+        uint16_t LogMessage::getAppID(){
             return this->getWithOffset<uint16_t>(0, sizeof (uint16_t)*8);
         }
 
-        uint64_t LogMessage::getTime() {
+        uint64_t LogMessage::getTime(){
             return getWithOffset<uint64_t>(offSet_time, sizeof (uint64_t)*8);
         }
 
-        uint8_t LogMessage::getMsgType() {
+        uint8_t LogMessage::getMsgType(){
             return getWithOffset<uint8_t>(offSet_msgType, sizeof (uint8_t)*8);
         }
 
-        uint8_t LogMessage::getMsgCounter() {
+        uint8_t LogMessage::getMsgCounter(){
             return getWithOffset<uint8_t>(offSet_msgCounter, sizeof (uint8_t)*8);
         }
 
-        uint16_t LogMessage::getMsgSize() {
+        uint16_t LogMessage::getMsgSize(){
             return getWithOffset<uint16_t>(offSet_msgSize, sizeof (uint16_t)*8);
         }
 
         std::string LogMessage::getLogMessage() {
-            uint16_t msgSize = getMsgSize();
-            return std::string(this->m_data.begin() + 14, this->m_data.begin() + 14 + msgSize);
+            getMsgSize();
+            std::vector<uint8_t> data = this->getRest();
+            return std::string(data.begin(),data.end());
         }
     } // namespace FlexLogger
 } // namespace flexd

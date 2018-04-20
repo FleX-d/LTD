@@ -33,22 +33,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace flexd {
     namespace FlexLogger {
-        
-        enum MsgType {
-            HANDSHAKE = 0,
-            VERBOSE = 1,
-            DEBUG = 2,
-            INFO = 3,
-            WARN = 4,
-            ERROR = 5,
-            FATAL = 6,
-            ALL = 7,
-            
-            SYSMSG_OK_NAME = 253,
-            SYSMSG_FALSE_NAME = 254,
-            DEFAULT = 255
-                    // TODO other types of message
-        };
+        namespace MsgType {
+            /*
+             *  Definition of message type for FlexLogger client <-> server communication
+             */
+            enum Enum {         
+                HANDSHAKE = 0x00,
+                VERBOSE,
+                DEBUG,
+                INFO,
+                WARN,
+                ERROR,
+                FATAL,
+                SETLOGLEVEL,
+
+                SETLOGLEVELACKSUCCES = 0xFB,
+                SETLOGLEVELACKFAIL = 0xFC,
+                HANDSHAKESUCCES  = 0xFD,   // system message confirming the correct name
+                HANDSHAKEFAIL = 0xFE, // answer if is name incorrect 
+                UNDEFINED = 0XFF
+            };
+        } // namespace MsgType
     } // namespace FlexLogger
 } // namespace flexd    
 

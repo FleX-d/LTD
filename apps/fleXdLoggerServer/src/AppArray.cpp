@@ -37,26 +37,36 @@ namespace flexd {
 
         AppArray::AppArray()
         : m_pos(m_list.begin()) {
-            memset(m_list.data(), 0, m_list.size());
+            std::fill(m_list.begin(),m_list.end(),nullptr);
         }
-
+        
+        /* Function for inserting application descriptor into vector.
+         * The function checks the unique of the application name and return the unique ID
+         * from range  0 - 65535.
+         */
         int AppArray::insertToArray(const std::string& appName, int descriptor) {
-            for (auto& ref : m_list) {
-                if (ref.get()) {
-                    if (ref->compareName(appName)) {
+            for (auto ref = m_list.begin(); ref < m_list.end(); ref++) {
+                if (ref->get()) {
+                    if (ref->get()->compareName(appName)) {
+                        if(!ref->get()->isOnline()){
+                            ref->get()->setAppDescriptor(descriptor);
+                            ref->get()->setOnline();
+                            return (ref - m_list.begin() );
+                        }
                         return -1;
                     }
                 }
             }
 
             auto addApp = [&appName, &descriptor](appVec::iterator it) {
-                auto tmp =std::make_unique<Application>(appName,descriptor);
+                auto tmp = std::make_shared<Application>(appName,descriptor);
                 it->swap(tmp);
             };
 
             if (++m_pos < m_list.end()) {
                 if (m_pos->get() == nullptr) {
                     addApp(m_pos);
+                    m_countOfConnectedApp++;
                     return (m_pos - m_list.begin() );
                 }
             } else {
@@ -64,11 +74,12 @@ namespace flexd {
                     if (pos->get() == nullptr) {
                         m_pos = pos;
                         addApp(m_pos);
+                        m_countOfConnectedApp++;
                         return (m_pos - m_list.begin());
                     }
                 }
             }
-            return -1;
+            return -2;
         }
 
         std::string AppArray::getAppName(uint16_t appID) const {
@@ -77,18 +88,45 @@ namespace flexd {
             }
             return std::string{};
         }
-
-        bool AppArray::removeFromArray(int appDescriptor) {
+        
+        const std::shared_ptr<Application> AppArray::getApp(const std::string& appName) const {
+            for (auto app : m_list) 
+            {
+                if(app->compareName(appName))
+                {
+                    return app;
+                }
+            }
+        }
+        
+        bool AppArray::unconnectApplication(int desctiptor) {
             for (auto& ref : m_list) {
                 if (ref.get()) {
-                    if (ref->getAppDescriptor() == appDescriptor) {
-                        ref.release();
+                    if (ref->getAppDescriptor() == desctiptor) {
+                        ref->setOffline();
+                        m_countOfConnectedApp--;
                         return true;
                     }
                 }
             }
             return false;
         }
+
+
+        bool AppArray::removeFromArray(int appDescriptor) {
+            for (auto ref : m_list) {
+                if (ref.get()) {
+                    if (ref->getAppDescriptor() == appDescriptor) {
+                        ref.reset();
+                        m_countOfConnectedApp--;
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        
+        
 
         AppArray::~AppArray() {
         }

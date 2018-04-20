@@ -38,21 +38,22 @@ namespace flexd {
     namespace FlexLogger {
 
         class AppArray {
-            typedef std::array<std::unique_ptr<Application>, 65536> appVec;
+            typedef std::array<std::shared_ptr<Application>, 65536> appVec;
         public:
             AppArray();
             virtual ~AppArray();
+            
             int insertToArray(const std::string& appName, int descriptor);              
             bool removeFromArray(int descriptor);
+            bool unconnectApplication(int desctiptor);
             std::string getAppName(uint16_t appID) const;
-            
+            const std::shared_ptr<Application> getApp(const std::string& appName)const;
             
             AppArray(const AppArray& orig) = delete;
         private:
-            bool compareDescription(Application);
-        private:
             appVec m_list;
             appVec::iterator m_pos;
+            uint16_t m_countOfConnectedApp;
             
             
 

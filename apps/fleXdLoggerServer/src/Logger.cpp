@@ -28,127 +28,168 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Author: Jakub Pekar
  */
 
-#include <vector>
 
 #include "Logger.h"
 #include "Application.h"
+#include <vector>
+#include <FleXdLogger.h>
 
 namespace flexd {
     namespace FlexLogger {
 
         Logger::Logger() {
-            // logLevelMax = MsgType::VERBOSE;
             int port = 15000;
             m_socServer = new iSocServer();
             m_socServer->connectFunck(port);
             m_socServer->listenServer();
-        }
-
-        bool Logger::loggingFunc() {
-            int client, valread;
-            std::string appName;
-            char buffer[1024];
-            std::vector<uint8_t> dataBuffer();
-            uint16_t appId;
+            openlog("FLEXLOGGER", LOG_CONS, LOG_LOCAL0);
+            writeLog("FleXdLogger",0,"INFO"," -> Init");
             
-            openlog("LOGGER", LOG_CONS, LOG_LOCAL0);
-            while (1) {
-                //Connecting of client app        
-                client = m_socServer->connectClient();
-                std::cout << "Client connected " << std::endl;
+        }   
+        
+        int Logger::handshake()
+        {
+            int client, valread;
+            uint8_t buffer[1024];
+           
+            //Connecting of client app        
+            client = m_socServer->connectClient();
+            std::cout << "Client connected " << std::endl;
 
                 /*Handshake and generate of appID*/
+            valread = m_socServer->recv(client, buffer, 1024);
+            std::vector<uint8_t>dataBuffer(buffer, buffer + valread);
+            if (valread) {
+            LogMessage initmessage(std::move(dataBuffer)); //create log init message
+            uint16_t appId = m_arrayOfApp.insertToArray(initmessage.getLogMessage(), client);
+
+                if (appId > 0) {
+                    LogMessage ackMessage(appId, (uint8_t) MsgType::Enum::HANDSHAKESUCCES, 0, std::to_string(appId));
+                    std::cout << "*ACKMESSAGE*-> ";
+                    ackMessage.logToCout();
+                
+                    std::vector<uint8_t> streamVector = ackMessage.releaseData();
+                    m_socServer->send(client, streamVector.data(), streamVector.size());
+                    return appId;
+                } else if (appId == -1) {
+                    LogMessage ackMessage(appId, (uint8_t) MsgType::Enum::HANDSHAKEFAIL, 0, std::string("***This application name using other client***"));
+                    std::cout << "*ACKMESSAGE*-> ";
+                    ackMessage.logToCout();
+                    std::vector<uint8_t> streamVector = ackMessage.releaseData();
+                    m_socServer->send(client, streamVector.data(), streamVector.size());
+                    return -1;
+                } else {
+                    return -2;
+                }
+                //TODO send ACK if is impossible accept next client
+            }else {
+                return -3;
+            }
+            
+        }
+
+        bool Logger::loggingFunc(const int client) // this will be implement in onMessage function in UDSServer
+        {
+            int valread;
+            std::string appName;
+            char buffer[1024];
+
+            while (true) 
+            {
                 valread = m_socServer->recv(client, buffer, 1024);
                 std::vector<uint8_t> dataBuffer(buffer, buffer + valread);
-                if (valread) {
-                    LogMessage initmessage(std::move(dataBuffer)); //create log init message
-                    //appName = initmessage.getLogMessage();
-                    appId = m_arrayOfApp.insertToArray(appName, client);
-
-                    if (appId != 0) {
-                        //std::cout << "*InitMessage* Appname: " << m_arrayOfApp.getApp(appId).getAppName() << std::endl;
-                        LogMessage ackMessage(appId, (uint8_t) MsgType::SYSMSG_OK_NAME, initmessage.getMsgCounter() + 1, std::to_string(appId));
-                        std::cout << "*ACKMESSAGE*-> ";
-                        ackMessage.logToCout();
-                        std::vector<uint8_t> streamVector = ackMessage.releaseData();
-                        m_socServer->send(client, streamVector.data(), streamVector.size());
-                    } else {
-                        std::cout << "************This application name using other client*************" << std::endl;
-                        LogMessage ackMessage(appId, (uint8_t) MsgType::SYSMSG_FALSE_NAME, initmessage.getMsgCounter() + 1, std::string("Error"));
-                        std::cout << "*ACKMESSAGE*-> ";
-                        ackMessage.logToCout();
-                        std::vector<uint8_t> streamVector = ackMessage.releaseData();
-                        m_socServer->send(client, streamVector.data(), streamVector.size());
-                    }
-
-                    /*Send appID*/
-
-
+                if (valread) 
+                {
+                    LogMessage message(std::move(dataBuffer));
+                    message.logToCout();
+                    logToSysLog(message);
+                } else {
+                    m_arrayOfApp.unconnectApplication(client);
+                    close(client);
+                    break;
                 }
+            } 
+            return true;
+        }
+        // rename to logging, when it will be able to implement ICL
+        bool Logger::logToSysLog(LogMessage& message) {
+            std::string priority;
+            
+            switch (message.getMsgType()) {
+                case MsgType::Enum::HANDSHAKE: priority = "HANDSHAKE";
+                    break;
+                case MsgType::Enum::VERBOSE:priority = "VERBOSE";
+                    break;
+                case MsgType::Enum::DEBUG:priority = "DEBUG";
+                    break;
+                case MsgType::Enum::INFO:priority = "INFO";
+                    break;
+                case MsgType::Enum::WARN:priority = "WARN";
+                    break;
+                case MsgType::Enum::ERROR:priority = "ERROR";
+                    break;
+                case MsgType::Enum::FATAL:priority = "FATAL";
+                    break;
+                default:
+                    priority = "SYSTEM/UNKNOW";
+                    break;
+            }
+            writeLog(m_arrayOfApp.getAppName(message.getAppID()), message.getTime(), priority, message.getLogMessage());
+            return true;
+        }
+        
+        void Logger::writeLog(const std::string appName,const uint64_t time, const std::string priority, const std::string message) {
+            uint8_t sysLogType = 4;
+            uint64_t timeVal;
+            if(time == 0)
+            {
+                timeVal = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+            } else {
+                timeVal = time;
+            }
+            syslog(sysLogType,"[%s][%ld][%s] %s ",
+                    appName.c_str(), timeVal, priority.c_str(), message.c_str());
+        }
 
-                while (1) {
-                    valread = m_socServer->recv(client, buffer, 1024);
-
-                    dataBuffer = std::vector<uint8_t> (buffer, buffer + valread);
-                    if (valread) {
-                        LogMessage message(std::move(dataBuffer));
-
-                        message.logToCout();
-                        //message.logToSysLog(m_arrayOfApp.getApp(message.getAppID()).getAppName());
-                        //logToSysLog(message);
-
-
-                    } else {
-                        //TODO remove application from map
-                        m_arrayOfApp.removeFromArray(client);
-                        close(client);
-
-                        break;
-                    }
+        
+        bool Logger::setLogLevel(const std::string& appName, MsgType::Enum logLevel) {
+            // TODO browse map and set log level for required app
+            // check if app is active and if yes send sysMsg for change loglevel
+            // don't forget write process log to syslog
+            std::shared_ptr<Application> app = m_arrayOfApp.getApp(appName);
+            app->setLogLevel(logLevel);
+ 
+            if(app->isOnline())
+            {
+                LogMessage msgSendLog(0,MsgType::Enum::SETLOGLEVEL,0,std::string(1,(uint8_t)logLevel));
+                std::vector<uint8_t> streamVector = msgSendLog.releaseData();
+                m_socServer->send(app->getAppDescriptor(), streamVector.data(), streamVector.size());
+                
+                //Recv acknowledge about syslog setting 
+                char buffer[128];
+                int valread = m_socServer->recv(app->getAppDescriptor(),buffer, 128);
+                std::vector<uint8_t>dataBuffer(buffer, buffer + valread);
+                if(valread > 0)
+                {
+                   LogMessage ackSetLogLvl(std::move(dataBuffer)); 
+                   if(ackSetLogLvl.getMsgType() == MsgType::Enum::SETLOGLEVELACKSUCCES){
+                       writeLog("FleXdLogger",0,"INFO","Set the log level on: " + appName + ". Application is online");
+                       return true;
+                   }
                 }
-
+                writeLog("FleXdLogger",0,"WARN","Can`t set log level on: " + appName );
+                return false;
                 
             }
-            closelog();
-        }/*
-bool Logger::logToSysLog(LogMessage& message) {
-    std::string priority;
-    uint8_t sysLogType = 4;
-    switch(message.getMsgType()){
-        case 0:priority = "HANDSHAKE";
-            //sysLogType = 6;
-            break;
-        case 1:priority = "VERBOSE";
-            //sysLogType = 6;
-            break;
-        case 2:priority = "DEBUG";
-           // sysLogType = 7;
-            break;
-        case 3:priority = "INFO";
-            //sysLogType = 6;
-            break;
-        case 4:priority = "WARN";
-            //sysLogType = 5;
-            break;
-        case 5:priority = "ERROR";
-            //sysLogType = 3;
-            break;
-        case 6:priority = "FATAL";
-            //sysLogType = 2;
-            break;
-        case 7:priority = "ALL";
-            //sysLogType = 1;
-            break;    
-    }
-    syslog(sysLogType ,"[%s][%ld][%s] %s ",m_arrayOfApp.getApp(message.getAppID()).getAppName, \
-            message.getTime(),\
-            priority.c_str(),
-            message.getLogMessage().c_str()
-            );
-}*/
-
+            
+            writeLog("FleXdLogger",0,"INFO"," -> Set the log level on: " + appName + ". Application is offline");
+            return true;
+            
+        }
+   
         Logger::~Logger() {
             delete m_socServer;
+            closelog();
         }
     } // namespace FlexLogger
 } // namespace flexd

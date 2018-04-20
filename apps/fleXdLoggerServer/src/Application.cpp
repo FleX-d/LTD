@@ -30,20 +30,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
+#include <FleXdLogger.h>
+
 #include "Application.h"
 namespace flexd {
     namespace FlexLogger {
 
         Application::Application(const std::string& appName, int appDescriptor)
         : m_appName(appName),      
-          m_appFileDesc(appDescriptor) {
+          m_appFileDesc(appDescriptor),
+          m_online(true),
+          m_logLevel(MsgType::Enum::VERBOSE){
+        }
+        void Application::setOnline() {
+            m_online = true;
         }
 
+        void Application::setOffline() {
+            m_online = false;
+        }
+        void Application::setAppDescriptor(int appFileDescriptor) {
+            m_appFileDesc = appFileDescriptor;
+        }
+        void Application::setLogLevel(MsgType::Enum logLevel) {
+            m_logLevel = logLevel;
+        }
+
+
+        MsgType::Enum Application::getLogLevel(){
+            return m_logLevel;
+        }
+
+        bool Application::isOnline() const {
+            return m_online;
+        }
+        
         std::string Application::getAppName() const{
             return m_appName;
         }
 
-        int Application::getAppDescriptor() const{
+        int Application::getAppDescriptor(){
             return m_appFileDesc;
         }
 

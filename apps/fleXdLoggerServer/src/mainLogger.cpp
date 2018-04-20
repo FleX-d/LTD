@@ -32,9 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 int main(int argc, char** argv) {
+    int clientDesc;
     flexd::FlexLogger::Logger logger;
-    logger.loggingFunc();
+    while(true){
+        clientDesc = logger.handshake();
+        if(clientDesc > 0){
+            logger.loggingFunc(clientDesc);
     
+        }
+    }
     return 0;
 }
 

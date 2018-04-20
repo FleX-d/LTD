@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+#include "MessageType.h"
 #include <cstring>
 #include <iostream>
 #include <stdint.h>
@@ -41,17 +42,24 @@ namespace flexd {
         class Application {
 
         public:
-            Application(const std::string& appName, int appDescriptor);
+            Application(const std::string& appName, int appDescriptor); // Set default loglevel
             Application(const Application& orig);
             virtual ~Application();
+            void setLogLevel(MsgType::Enum logLevel);
+            void setOnline();
+            void setOffline();
+            void setAppDescriptor(int appFileDescriptor);
             std::string getAppName()const;
-            int getAppDescriptor()const;
+            int getAppDescriptor();
+            MsgType::Enum getLogLevel();
+            bool isOnline() const;
             bool compareName(const std::string& name);
-            bool operator == (const Application& lhs)const{ return this->m_appFileDesc == lhs.m_appFileDesc ;}
             
         private:
             std::string m_appName;
             int m_appFileDesc;
+            bool m_online; // represent if app is active or not
+            MsgType::Enum m_logLevel;
         };
         
     } // namespace FlexLogger
