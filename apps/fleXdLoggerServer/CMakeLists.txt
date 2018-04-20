@@ -37,6 +37,7 @@ SET(privateHeaders
     inc/iSocServer.h
     inc/Logger.h
     inc/LogMessage.h
+    inc/Connector.h
 )
 
 SET(privateSources
@@ -46,6 +47,7 @@ SET(privateSources
   src/Logger.cpp
   src/LogMessage.cpp
   src/mainLogger.cpp
+  src/Connector.cpp
 )
 
 add_executable(${PROJECT_NAME} ${privateSources} ${privateHeaders} ${publicHeaders})

@@ -26,16 +26,16 @@ namespace flexd {
             Connector();
             virtual ~Connector();
 
-            virtual void onWrite(flexd::ilc::epoll::pSharedFleXdIPCMsg msg);
+            void onWrite(flexd::ilc::epoll::pSharedFleXdIPCMsg msg);
+            void onMessage(flexd::ilc::epoll::pSharedFleXdIPCMsg msg);
 
-            virtual void onMessage(flexd::ilc::epoll::pSharedFleXdIPCMsg msg);
-
+            
 
             Connector(const Connector& orig) = delete;
             Connector& operator=(const Connector&) = delete;
 
         private:
-            flexd::ilc::epoll::FleXdEpoll m_pooler(10);
+            flexd::ilc::epoll::FleXdEpoll m_pooler;
 
         };
 

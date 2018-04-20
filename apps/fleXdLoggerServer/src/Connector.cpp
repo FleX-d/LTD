@@ -11,17 +11,36 @@
  * Created on April 13, 2018, 1:03 PM
  */
 
+#include <FleXdUDS.h>
+
 #include "Connector.h"
+#include "LogMessage.h"
 
 namespace flexd {
     namespace FlexLogger {
 
         Connector::Connector() 
-        : flexd::ilc::epoll::FleXdUDSServer("/tmp/fleXdLogger.soc",m_pooler)
+        :m_pooler(10), 
+        flexd::ilc::epoll::FleXdUDSServer("/tmp/fleXdLogger.soc",m_pooler)
         {
             this->initialization();
             m_pooler.loop();
         }
+        
+        void Connector::onMessage(flexd::ilc::epoll::pSharedFleXdIPCMsg msg) {
+            if(msg)
+            {   
+                std::vector<uint8_t> recvPayload;
+                recvPayload = msg->getPayload();
+                LogMessage recvLog();
+                
+                
+            } else {
+                // fail message
+                
+            }
+        }
+
 
 
         Connector::~Connector() {

@@ -56,7 +56,7 @@ namespace flexd {
             client = m_socServer->connectClient();
             std::cout << "Client connected " << std::endl;
 
-                /*Handshake and generate of appID*/
+            /*Handshake and generate of appID*/
             valread = m_socServer->recv(client, buffer, 1024);
             std::vector<uint8_t>dataBuffer(buffer, buffer + valread);
             if (valread) {
