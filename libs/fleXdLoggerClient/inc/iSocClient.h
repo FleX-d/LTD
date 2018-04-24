@@ -24,46 +24,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /* 
- * File:   FleXdLogMessage.h
+ * File:   iSocClient.h
  * Author: Jakub Pekar
  */
 
-#ifndef FLEXDLOGMESSAGE_H
-#define FLEXDLOGMESSAGE_H
 
-#include <BitStream.h>
-#include <iostream>
-#include <thread>
-#include <vector>
-#include <chrono>
+#ifndef ISOCCLIENT_H
+#define ISOCCLIENT_H
 
-namespace flexd {
-    namespace logger {
-        
-        class FleXdLogMessage : public BiteStream {
-        public:
-            FleXdLogMessage(std::vector<uint8_t>&& data);
-            FleXdLogMessage(uint16_t appID, uint8_t msgType, uint8_t msgCounter, std::string logMessage);
-            ~FleXdLogMessage() = default;
+#include <stdint.h>
+#include <stdio.h>
+#include <sys/socket.h>
+#include <stdlib.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <arpa/inet.h>
 
-            void logToCout();
-            uint16_t getAppID();
-            uint64_t getTime();
-            uint8_t getMsgType();
-            uint8_t getMsgCounter();
-            uint16_t getMsgSize();
-            std::string getLogMessage();
-            FleXdLogMessage(const FleXdLogMessage& orig) = delete;
-        private:
-            static const uint8_t offSet_appID = 0;
-            static const uint8_t offSet_time = 16;
-            static const uint8_t offSet_msgType = 80;
-            static const uint8_t offSet_msgCounter = 88;
-            static const uint8_t offSet_msgSize = 96;
-            static const uint8_t offSet_logMessage = 112;
-            
-        };
-    } // namespace logger
-} // namespace flexd
-#endif /* FLEXDLOGMESSAGE_H */
+class iSocClient {
+    
+public:
+    iSocClient();
+    iSocClient(const iSocClient& orig) = default;
+    bool connectF(char* pAddress, int pPort);
+    bool send(void *pBuffer, uint16_t pSize);
+    int recv(int pDescriptor, void* pBuffer, uint16_t pSize);
+    int recv(void* pBuffer, uint16_t pSize);
+    ~iSocClient();
+    
+private:
+    sockaddr_in serv_addr;
+    sockaddr_in address;
+    int sock;
+};
+
+#endif /* ISOCCLIENT_H */
 

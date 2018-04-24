@@ -30,26 +30,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef FLEXDLOGGERCLIENT_H
 #define FLEXDLOGGERCLIENT_H
-
+#include "FleXdMessageType.h"
 #include <algorithm>
 #include <thread>
 #include <iostream>
 #include <sstream>
 
 
-#define FLEX_LOG_TRACE(...)  \
+#define FLEXD_LOG_TRACE(...)  \
     flexd::logger::FleXdLogger::instance().log(flexd::logger::MsgType::Enum::VERBOSE, "trace", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
-#define FLEX_LOG_DEBUG(...)  \
+#define FLEXD_LOG_DEBUG(...)  \
     flexd::logger::FleXdLogger::instance().log(flexd::logger::MsgType::Enum::DEBUG, "debug", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
-#define FLEX_LOG_INFO(...)  \
+#define FLEXD_LOG_INFO(...)  \
     flexd::logger::FleXdLogger::instance().log(flexd::logger::MsgType::Enum::INFO, "info", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
-#define FLEX_LOG_WARN(...)  \
+#define FLEXD_LOG_WARN(...)  \
     flexd::logger::FleXdLogger::instance().log(flexd::logger::MsgType::Enum::WARN, "warning", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
-#define FLEX_LOG_ERROR(...)  \
+#define FLEXD_LOG_ERROR(...)  \
     flexd::logger::FleXdLogger::instance().log(flexd::logger::MsgType::Enum::ERROR, "error", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
-#define FLEX_LOG_FATAL(...)  \
+#define FLEXD_LOG_FATAL(...)  \
     flexd::logger::FleXdLogger::instance().log(flexd::logger::MsgType::Enum::FATAL, "fatal", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
-#define FLEX_LOG_INIT(...)  \
+#define FLEXD_LOG_INIT(...)  \
     flexd::logger::FleXdLogger::instance().setAppId(__VA_ARGS__);
 namespace {
 

@@ -7,7 +7,7 @@ message(STATUS "*  " ${PROJECT_NAME})
 message(STATUS "***" )
 
 SET(publicHeaders
-  inc/public/MessageType.h
+  inc/public/FleXdMessageType.h
 )
 
 #SET(privateHeaders

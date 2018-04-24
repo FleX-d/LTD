@@ -40,6 +40,8 @@ namespace flexd {
             m_socServer = new iSocServer();
             m_socServer->connectFunck(port);
             m_socServer->listenServer();
+           
+            
             openlog("FLEXLOGGER", LOG_CONS, LOG_LOCAL0);
             writeLog("FleXdLoggerServer",0,"INFO"," -> Init");
             
@@ -53,16 +55,17 @@ namespace flexd {
             //Connecting of client app        
             client = m_socServer->connectClient();
             std::cout << "Client connected " << std::endl;
+            writeLog("FleXdLoggerServer",0,"INFO"," -> Client connected");
 
             /*Handshake and generate of appID*/
             valread = m_socServer->recv(client, buffer, 1024);
             std::vector<uint8_t>dataBuffer(buffer, buffer + valread);
             if (valread) {
-            LogMessage initmessage(std::move(dataBuffer)); //create log init message
+            FleXdLogMessage initmessage(std::move(dataBuffer)); //create log init message
             uint16_t appId = m_arrayOfApp.insertToArray(initmessage.getLogMessage(), client);
 
                 if (appId > 0) {
-                    LogMessage ackMessage(appId, (uint8_t) MsgType::Enum::HANDSHAKESUCCES, 0, std::to_string(appId));
+                    FleXdLogMessage ackMessage(appId, (uint8_t) MsgType::Enum::HANDSHAKESUCCES, 0, std::to_string(appId));
                     std::cout << "*ACKMESSAGE*-> ";
                     ackMessage.logToCout();
                 
@@ -70,7 +73,7 @@ namespace flexd {
                     m_socServer->send(client, streamVector.data(), streamVector.size());
                     return appId;
                 } else if (appId == -1) {
-                    LogMessage ackMessage(appId, (uint8_t) MsgType::Enum::HANDSHAKEFAIL, 0, std::string("***This application name using other client***"));
+                    FleXdLogMessage ackMessage(appId, (uint8_t) MsgType::Enum::HANDSHAKEFAIL, 0, std::string("***This application name using other client***"));
                     std::cout << "*ACKMESSAGE*-> ";
                     ackMessage.logToCout();
                     std::vector<uint8_t> streamVector = ackMessage.releaseData();
@@ -98,7 +101,7 @@ namespace flexd {
                 std::vector<uint8_t> dataBuffer(buffer, buffer + valread);
                 if (valread) 
                 {
-                    LogMessage message(std::move(dataBuffer));
+                    FleXdLogMessage message(std::move(dataBuffer));
                     message.logToCout();
                     logToSysLog(message);
                 } else {
@@ -110,7 +113,7 @@ namespace flexd {
             return true;
         }
         // rename to logging, when it will be able to implement ICL
-        bool FleXdLoggerServer::logToSysLog(LogMessage& message) {
+        bool FleXdLoggerServer::logToSysLog(FleXdLogMessage& message) {
             std::string priority;
             
             switch (message.getMsgType()) {
@@ -154,12 +157,12 @@ namespace flexd {
             // TODO browse map and set log level for required app
             // check if app is active and if yes send sysMsg for change loglevel
             // don't forget write process log to syslog
-            std::shared_ptr<Application> app = m_arrayOfApp.getApp(appName);
+            std::shared_ptr<FleXdApplication> app = m_arrayOfApp.getApp(appName);
             app->setLogLevel(logLevel);
  
             if(app->isOnline())
             {
-                LogMessage msgSendLog(0,MsgType::Enum::SETLOGLEVEL,0,std::string(1,(uint8_t)logLevel));
+                FleXdLogMessage msgSendLog(0,MsgType::Enum::SETLOGLEVEL,0,std::string(1,(uint8_t)logLevel));
                 std::vector<uint8_t> streamVector = msgSendLog.releaseData();
                 m_socServer->send(app->getAppDescriptor(), streamVector.data(), streamVector.size());
                 
@@ -169,7 +172,7 @@ namespace flexd {
                 std::vector<uint8_t>dataBuffer(buffer, buffer + valread);
                 if(valread > 0)
                 {
-                   LogMessage ackSetLogLvl(std::move(dataBuffer)); 
+                   FleXdLogMessage ackSetLogLvl(std::move(dataBuffer)); 
                    if(ackSetLogLvl.getMsgType() == MsgType::Enum::SETLOGLEVELACKSUCCES){
                        writeLog("FleXdLoggerServer",0,"INFO","Set the log level on: " + appName + ". Application is online");
                        return true;

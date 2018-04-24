@@ -39,12 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace flexd {
     namespace logger {
 
-        class Application {
+        class FleXdApplication {
 
         public:
-            Application(const std::string& appName, int appDescriptor); // Set default loglevel
-            Application(const Application& orig);
-            virtual ~Application();
+            FleXdApplication(const std::string& appName, int appDescriptor); // Set default loglevel
+            FleXdApplication(const FleXdApplication& orig);
+            virtual ~FleXdApplication();
             void setLogLevel(MsgType::Enum logLevel);
             void setOnline();
             void setOffline();

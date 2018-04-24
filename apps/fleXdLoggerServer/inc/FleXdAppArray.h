@@ -40,19 +40,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace flexd {
     namespace logger {
 
-        class AppArray {
-            typedef std::array<std::shared_ptr<Application>, UINT16_MAX> appVec;
+        class FleXdAppArray {
+            typedef std::array<std::shared_ptr<FleXdApplication>, UINT16_MAX> appVec;
         public:
-            AppArray();
-            virtual ~AppArray();
+            FleXdAppArray();
+            virtual ~FleXdAppArray();
             
             int insertToArray(const std::string& appName, int descriptor);              
             bool removeFromArray(int descriptor);
             bool unconnectApplication(int desctiptor);
             std::string getAppName(uint16_t appID) const;
-            const std::shared_ptr<Application> getApp(const std::string& appName)const;
+            const std::shared_ptr<FleXdApplication> getApp(const std::string& appName)const;
             
-            AppArray(const AppArray& orig) = delete;
+            FleXdAppArray(const FleXdAppArray& orig) = delete;
         private:
             appVec m_list;
             appVec::iterator m_pos;

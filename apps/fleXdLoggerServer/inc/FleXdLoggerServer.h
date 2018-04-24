@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FleXdLogMessage.h"
 #include "FleXdMessageType.h"
 #include "FleXdAppArray.h"
+#include "FleXdLoggerIPC.h"
 #include <sstream>
 #include <thread>
 #include <syslog.h>
@@ -55,11 +56,12 @@ namespace flexd {
             
             FleXdLoggerServer(const FleXdLoggerServer& orig) = delete;
         private:
-            bool logToSysLog(LogMessage& message); 
+            bool logToSysLog(FleXdLogMessage& message); 
             void writeLog(const std::string appName,const uint64_t time, const std::string priority, const std::string message);
         private:
-            AppArray m_arrayOfApp;
+            FleXdAppArray m_arrayOfApp;
             //TODO IPC (now it run on sockets)
+            //FleXdLoggerIPC m_loggerIPC;
             iSocServer* m_socServer;
         };
         

@@ -5,35 +5,35 @@
  */
 
 /* 
- * File:   FleXdConnector.cpp
+ * File:   FleXdLoggerIPC.cpp
  * Author: dev
  * 
  * Created on April 13, 2018, 1:03 PM
  */
 
-#include <FleXdUDS.h>
 
-#include "FleXdConnector.h"
+#include "FleXdLoggerIPC.h"
 #include "FleXdLogMessage.h"
+#include "FleXdLoggerServer.h"
 
 namespace flexd {
     namespace logger {
 
-        Connector::Connector() 
-        : flexd::ilc::epoll::FleXdUDSServer("/tmp/fleXdLogger.soc",m_pooler),
-          m_pooler(10)
+        FleXdLoggerIPC::FleXdLoggerIPC(std::function<void(FleXdLogMessage)> logging) 
+        :m_pooler(10), 
+        flexd::icl::epoll::FleXdUDSServer("/tmp/fleXdLogger.soc",m_pooler)          
         {
+            
             this->initialization();
             m_pooler.loop();
         }
         
-        void Connector::onMessage(flexd::ilc::epoll::pSharedFleXdIPCMsg msg) {
+        void FleXdLoggerIPC::onMessage(flexd::icl::epoll::pSharedFleXdIPCMsg msg) {
             if(msg)
             {
                 std::vector<uint8_t> recvPayload;
                 recvPayload = msg->getPayload();
-                LogMessage recvLog();
-                
+                FleXdLogMessage recvLog(std::move(recvPayload));   
                 
             } else {
                 // fail message
@@ -41,9 +41,7 @@ namespace flexd {
             }
         }
 
-
-
-        Connector::~Connector() {
+        FleXdLoggerIPC::~FleXdLoggerIPC() {
         }
 
     } // namespace logger

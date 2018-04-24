@@ -24,70 +24,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /* 
- * File:   FleXdApplication.cpp
- * Author: Jakub Pekar
+ * File:   LogStream.h
+ * Author: Branislav Podkonicky
+ *
+ * Created on March 15, 2018, 12:44 PM
  */
 
+#ifndef LOGSTREAM_H
+#define LOGSTREAM_H
 
-#include "FleXdApplication.h"
+#include <BitStream.h>
+#include "FleXdMessageType.h"
+#include <sstream>
 
 namespace flexd {
     namespace logger {
 
-        FleXdApplication::FleXdApplication(const std::string& appName, int appDescriptor)
-        : m_appName(appName),      
-          m_appFileDesc(appDescriptor),
-          m_online(true),
-          m_logLevel(MsgType::Enum::VERBOSE){
-        }
-        void FleXdApplication::setOnline() {
-            m_online = true;
-        }
+        class LogStream : public BiteStream {
+        public:
+            explicit LogStream(std::vector<uint8_t>&& data);
+            explicit LogStream(uint16_t appID, time_t time, flexd::logger::MsgType::Enum messageType, uint8_t messageCounter, const std::string& message);
+            explicit LogStream(uint16_t appID, time_t time, flexd::logger::MsgType::Enum messageType, uint8_t messageCounter, const std::stringstream&& message);
+            virtual ~LogStream();
+            uint16_t getAppID();
+            time_t getTime();
+            flexd::logger::MsgType::Enum getMessageType();
+            uint8_t getMessageCounter();
+            uint16_t getMessageLength();
+            std::string getMessage();
+            virtual void logToCout();
 
-        void FleXdApplication::setOffline() {
-            m_online = false;
-        }
-        void FleXdApplication::setAppDescriptor(int appFileDescriptor) {
-            m_appFileDesc = appFileDescriptor;
-        }
-        void FleXdApplication::setLogLevel(MsgType::Enum logLevel) {
-            m_logLevel = logLevel;
-        }
-
-
-        MsgType::Enum FleXdApplication::getLogLevel(){
-            return m_logLevel;
-        }
-
-        bool FleXdApplication::isOnline() const {
-            return m_online;
-        }
-        
-        std::string FleXdApplication::getAppName() const{
-            return m_appName;
-        }
-
-        int FleXdApplication::getAppDescriptor(){
-            return m_appFileDesc;
-        }
-
-        bool FleXdApplication::compareName(const std::string& name) {
-            if(m_appName == name){
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        FleXdApplication::FleXdApplication(const FleXdApplication& orig) {
-            this->m_appFileDesc =orig.m_appFileDesc;
-            this->m_appName = orig.m_appName;
-        }
-
-
-        FleXdApplication::~FleXdApplication() {
-        }
-        
+        private:
+            const static size_t appID_size = 16;
+            const static size_t time_size = 64;
+            const static size_t messageType_size = 8;
+            const static size_t messageCounter_size = 8;
+            const static size_t messageLength_size = 16;
+        };
     } // namespace logger
 } // namespace flexd
+
+#endif /* LOGSTREAM_H */
 

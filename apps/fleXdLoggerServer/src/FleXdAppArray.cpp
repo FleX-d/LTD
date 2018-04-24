@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace flexd {
     namespace logger {
 
-        AppArray::AppArray()
+        FleXdAppArray::FleXdAppArray()
         : m_pos(m_list.begin()) {
             std::fill(m_list.begin(),m_list.end(),nullptr);
         }
@@ -44,7 +44,7 @@ namespace flexd {
          * The function checks the unique of the application name and return the unique ID
          * from range  0 - 65535.
          */
-        int AppArray::insertToArray(const std::string& appName, int descriptor) {
+        int FleXdAppArray::insertToArray(const std::string& appName, int descriptor) {
             for (auto ref = m_list.begin(); ref < m_list.end(); ref++) {
                 if (ref->get()) {
                     if (ref->get()->compareName(appName)) {
@@ -59,7 +59,7 @@ namespace flexd {
             }
 
             auto addApp = [&appName, &descriptor](appVec::iterator it) {
-                auto tmp = std::make_shared<Application>(appName,descriptor);
+                auto tmp = std::make_shared<FleXdApplication>(appName,descriptor);
                 it->swap(tmp);
             };
 
@@ -82,14 +82,14 @@ namespace flexd {
             return -2;
         }
 
-        std::string AppArray::getAppName(uint16_t appID) const {
+        std::string FleXdAppArray::getAppName(uint16_t appID) const {
             if (m_list[appID].get()) {
                 return m_list[appID]->getAppName();
             }
             return std::string{};
         }
         
-        const std::shared_ptr<Application> AppArray::getApp(const std::string& appName) const {
+        const std::shared_ptr<FleXdApplication> FleXdAppArray::getApp(const std::string& appName) const {
             for (auto app : m_list) 
             {
                 if(app->compareName(appName))
@@ -100,7 +100,7 @@ namespace flexd {
             return nullptr;
         }
         
-        bool AppArray::unconnectApplication(int desctiptor) {
+        bool FleXdAppArray::unconnectApplication(int desctiptor) {
             for (auto& ref : m_list) {
                 if (ref.get()) {
                     if (ref->getAppDescriptor() == desctiptor) {
@@ -114,7 +114,7 @@ namespace flexd {
         }
 
 
-        bool AppArray::removeFromArray(int appDescriptor) {
+        bool FleXdAppArray::removeFromArray(int appDescriptor) {
             for (auto ref : m_list) {
                 if (ref.get()) {
                     if (ref->getAppDescriptor() == appDescriptor) {
@@ -129,7 +129,7 @@ namespace flexd {
         
         
 
-        AppArray::~AppArray() {
+        FleXdAppArray::~FleXdAppArray() {
         }
         
     } // namespace logger

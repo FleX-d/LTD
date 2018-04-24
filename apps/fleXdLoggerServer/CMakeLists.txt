@@ -46,7 +46,7 @@ SET(privateHeaders
     inc/iSocServer.h
     inc/FleXdLoggerServer.h
     inc/FleXdLogMessage.h
-    inc/FleXdConnector.h
+    inc/FleXdLoggerIPC.h
 )
 
 SET(privateSources
@@ -56,7 +56,7 @@ SET(privateSources
   src/FleXdLoggerServer.cpp
   src/FleXdLogMessage.cpp
   src/mainFleXdLogger.cpp
-  src/FleXdConnector.cpp
+  src/FleXdLoggerIPC.cpp
 )
 
 add_executable(${PROJECT_NAME} ${privateSources} ${privateHeaders} ${publicHeaders})
