@@ -24,16 +24,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /* 
- * File:   AppArray.cpp
+ * File:   FleXdAppArray.cpp
  * Author: Jakub Pekar
  */
 
-#include "AppArray.h"
+#include "FleXdAppArray.h"
 
 #include <limits>
 
 namespace flexd {
-    namespace FlexLogger {
+    namespace logger {
 
         AppArray::AppArray()
         : m_pos(m_list.begin()) {
@@ -97,6 +97,7 @@ namespace flexd {
                     return app;
                 }
             }
+            return nullptr;
         }
         
         bool AppArray::unconnectApplication(int desctiptor) {
@@ -130,6 +131,7 @@ namespace flexd {
 
         AppArray::~AppArray() {
         }
-    } // namespace FlexLogger
+        
+    } // namespace logger
 } // namespace flexd
 

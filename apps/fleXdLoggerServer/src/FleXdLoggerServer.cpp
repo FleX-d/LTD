@@ -24,30 +24,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /* 
- * File:   Logger.cpp
+ * File:   FleXdLoggerServer.cpp
  * Author: Jakub Pekar
  */
 
-
-#include "Logger.h"
-#include "Application.h"
+#include "FleXdLoggerServer.h"
+#include "FleXdApplication.h"
 #include <vector>
-#include <FleXdLogger.h>
 
 namespace flexd {
-    namespace FlexLogger {
+    namespace logger {
 
-        Logger::Logger() {
+        FleXdLoggerServer::FleXdLoggerServer() {
             int port = 15000;
             m_socServer = new iSocServer();
             m_socServer->connectFunck(port);
             m_socServer->listenServer();
             openlog("FLEXLOGGER", LOG_CONS, LOG_LOCAL0);
-            writeLog("FleXdLogger",0,"INFO"," -> Init");
+            writeLog("FleXdLoggerServer",0,"INFO"," -> Init");
             
         }   
         
-        int Logger::handshake()
+        int FleXdLoggerServer::handshake()
         {
             int client, valread;
             uint8_t buffer[1024];
@@ -88,7 +86,7 @@ namespace flexd {
             
         }
 
-        bool Logger::loggingFunc(const int client) // this will be implement in onMessage function in UDSServer
+        bool FleXdLoggerServer::loggingFunc(const int client) // this will be implement in onMessage function in UDSServer
         {
             int valread;
             std::string appName;
@@ -112,7 +110,7 @@ namespace flexd {
             return true;
         }
         // rename to logging, when it will be able to implement ICL
-        bool Logger::logToSysLog(LogMessage& message) {
+        bool FleXdLoggerServer::logToSysLog(LogMessage& message) {
             std::string priority;
             
             switch (message.getMsgType()) {
@@ -138,7 +136,7 @@ namespace flexd {
             return true;
         }
         
-        void Logger::writeLog(const std::string appName,const uint64_t time, const std::string priority, const std::string message) {
+        void FleXdLoggerServer::writeLog(const std::string appName,const uint64_t time, const std::string priority, const std::string message) {
             uint8_t sysLogType = 4;
             uint64_t timeVal;
             if(time == 0)
@@ -152,7 +150,7 @@ namespace flexd {
         }
 
         
-        bool Logger::setLogLevel(const std::string& appName, MsgType::Enum logLevel) {
+        bool FleXdLoggerServer::setLogLevel(const std::string& appName, MsgType::Enum logLevel) {
             // TODO browse map and set log level for required app
             // check if app is active and if yes send sysMsg for change loglevel
             // don't forget write process log to syslog
@@ -173,23 +171,23 @@ namespace flexd {
                 {
                    LogMessage ackSetLogLvl(std::move(dataBuffer)); 
                    if(ackSetLogLvl.getMsgType() == MsgType::Enum::SETLOGLEVELACKSUCCES){
-                       writeLog("FleXdLogger",0,"INFO","Set the log level on: " + appName + ". Application is online");
+                       writeLog("FleXdLoggerServer",0,"INFO","Set the log level on: " + appName + ". Application is online");
                        return true;
                    }
                 }
-                writeLog("FleXdLogger",0,"WARN","Can`t set log level on: " + appName );
+                writeLog("FleXdLoggerServer",0,"WARN","Can`t set log level on: " + appName );
                 return false;
                 
             }
             
-            writeLog("FleXdLogger",0,"INFO"," -> Set the log level on: " + appName + ". Application is offline");
+            writeLog("FleXdLoggerServer",0,"INFO"," -> Set the log level on: " + appName + ". Application is offline");
             return true;
             
         }
    
-        Logger::~Logger() {
+        FleXdLoggerServer::~FleXdLoggerServer() {
             delete m_socServer;
             closelog();
         }
-    } // namespace FlexLogger
+    } // namespace logger
 } // namespace flexd

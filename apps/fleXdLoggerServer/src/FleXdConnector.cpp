@@ -5,7 +5,7 @@
  */
 
 /* 
- * File:   Connector.cpp
+ * File:   FleXdConnector.cpp
  * Author: dev
  * 
  * Created on April 13, 2018, 1:03 PM
@@ -13,15 +13,15 @@
 
 #include <FleXdUDS.h>
 
-#include "Connector.h"
-#include "LogMessage.h"
+#include "FleXdConnector.h"
+#include "FleXdLogMessage.h"
 
 namespace flexd {
-    namespace FlexLogger {
+    namespace logger {
 
         Connector::Connector() 
-        :m_pooler(10), 
-        flexd::ilc::epoll::FleXdUDSServer("/tmp/fleXdLogger.soc",m_pooler)
+        : flexd::ilc::epoll::FleXdUDSServer("/tmp/fleXdLogger.soc",m_pooler),
+          m_pooler(10)
         {
             this->initialization();
             m_pooler.loop();
@@ -29,7 +29,7 @@ namespace flexd {
         
         void Connector::onMessage(flexd::ilc::epoll::pSharedFleXdIPCMsg msg) {
             if(msg)
-            {   
+            {
                 std::vector<uint8_t> recvPayload;
                 recvPayload = msg->getPayload();
                 LogMessage recvLog();
@@ -46,5 +46,5 @@ namespace flexd {
         Connector::~Connector() {
         }
 
-    } // namespace FlexLogger
+    } // namespace logger
 } // namespace flexd    

@@ -24,39 +24,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /* 
- * File:   MessageType.h
+ * File:   FleXdLoggerServer.h
  * Author: Jakub Pekar
  */
 
-#ifndef MESSAGETYPE_H
-#define MESSAGETYPE_H
+#ifndef FLEXLOGGERSERVER_H
+#define FLEXLOGGERSERVER_H
+
+
+#include "iSocServer.h"
+#include "FleXdLogMessage.h"
+#include "FleXdMessageType.h"
+#include "FleXdAppArray.h"
+#include <sstream>
+#include <thread>
+#include <syslog.h>
+#include <string>
 
 namespace flexd {
-    namespace FlexLogger {
-        namespace MsgType {
-            /*
-             *  Definition of message type for FlexLogger client <-> server communication
-             */
-            enum Enum {         
-                HANDSHAKE = 0x00,
-                VERBOSE,
-                DEBUG,
-                INFO,
-                WARN,
-                ERROR,
-                FATAL,
-                SETLOGLEVEL,
+    namespace logger {
+        
+        class FleXdLoggerServer {
+        public:
+            FleXdLoggerServer();
+            virtual ~FleXdLoggerServer();
+            
+            bool loggingFunc(const int client);                 //logging only for one application (TODO: threads?? Or solution is IPC?)
+            bool setLogLevel(const std::string& appName, MsgType::Enum logLevel); 
+            int handshake();
+            
+            FleXdLoggerServer(const FleXdLoggerServer& orig) = delete;
+        private:
+            bool logToSysLog(LogMessage& message); 
+            void writeLog(const std::string appName,const uint64_t time, const std::string priority, const std::string message);
+        private:
+            AppArray m_arrayOfApp;
+            //TODO IPC (now it run on sockets)
+            iSocServer* m_socServer;
+        };
+        
+    } // namespace logger
+} // namespace flexd       
 
-                SETLOGLEVELACKSUCCES = 0xFB,
-                SETLOGLEVELACKFAIL = 0xFC,
-                HANDSHAKESUCCES  = 0xFD,   // system message confirming the correct name
-                HANDSHAKEFAIL = 0xFE, // answer if is name incorrect 
-                UNDEFINED = 0XFF
-            };
-        } // namespace MsgType
-    } // namespace FlexLogger
-} // namespace flexd    
-
-
-#endif /* MESSAGETYPE_H */
+#endif /* FLEXLOGGERSERVER_H */
 

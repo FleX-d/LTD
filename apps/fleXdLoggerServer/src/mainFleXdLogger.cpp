@@ -24,45 +24,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /* 
- * File:   Logger.h
+ * File:   mainFleXdLogger.cpp
  * Author: Jakub Pekar
  */
 
-#ifndef LOGGER_H
-#define LOGGER_H
+#include "FleXdLoggerServer.h"
 
 
-#include "iSocServer.h"
-#include "LogMessage.h"
-#include "MessageType.h"
-#include "AppArray.h"
-#include <sstream>
-#include <thread>
-#include <syslog.h>
-#include <string>
-namespace flexd {
-    namespace FlexLogger {
-        class Logger {
-        public:
-            Logger();
-            virtual ~Logger();
-            
-            bool loggingFunc(const int client);                 //logging only for one application (TODO: threads?? Or solution is IPC?)
-            bool setLogLevel(const std::string& appName,MsgType::Enum logLevel); 
-            int handshake();
-            
-            Logger(const Logger& orig) = delete;
-        private:
-            bool logToSysLog(LogMessage& message); 
-            void writeLog(const std::string appName,const uint64_t time, const std::string priority, const std::string message);
-        private:
-            AppArray m_arrayOfApp;
-            //TODO IPC (now it run on sockets)
-            iSocServer* m_socServer;
-        };
-        
-    } // namespace FlexLogger
-} // namespace flexd       
-
-#endif /* LOGGER_H */
+int main(int argc, char** argv) {
+    int clientDesc;
+    flexd::logger::FleXdLoggerServer loggerServer;
+    while(true){
+        clientDesc = loggerServer.handshake();
+        if(clientDesc > 0){
+            loggerServer.loggingFunc(clientDesc);
+    
+        }
+    }
+    return 0;
+}
 

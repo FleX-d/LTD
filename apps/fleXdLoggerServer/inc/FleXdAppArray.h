@@ -24,71 +24,44 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /* 
- * File:   Application.cpp
+ * File:   FleXdAppArray.h
  * Author: Jakub Pekar
  */
 
+#ifndef FLEXDAPPARRAY_H
+#define FLEXDAPPARRAY_H
+
+#include <cstdint>
+#include <vector>
+#include <memory>
+#include "FleXdApplication.h"
 
 
-#include <FleXdLogger.h>
-
-#include "Application.h"
 namespace flexd {
-    namespace FlexLogger {
+    namespace logger {
 
-        Application::Application(const std::string& appName, int appDescriptor)
-        : m_appName(appName),      
-          m_appFileDesc(appDescriptor),
-          m_online(true),
-          m_logLevel(MsgType::Enum::VERBOSE){
-        }
-        void Application::setOnline() {
-            m_online = true;
-        }
+        class AppArray {
+            typedef std::array<std::shared_ptr<Application>, UINT16_MAX> appVec;
+        public:
+            AppArray();
+            virtual ~AppArray();
+            
+            int insertToArray(const std::string& appName, int descriptor);              
+            bool removeFromArray(int descriptor);
+            bool unconnectApplication(int desctiptor);
+            std::string getAppName(uint16_t appID) const;
+            const std::shared_ptr<Application> getApp(const std::string& appName)const;
+            
+            AppArray(const AppArray& orig) = delete;
+        private:
+            appVec m_list;
+            appVec::iterator m_pos;
+            uint16_t m_countOfConnectedApp;
 
-        void Application::setOffline() {
-            m_online = false;
-        }
-        void Application::setAppDescriptor(int appFileDescriptor) {
-            m_appFileDesc = appFileDescriptor;
-        }
-        void Application::setLogLevel(MsgType::Enum logLevel) {
-            m_logLevel = logLevel;
-        }
+        };
 
-
-        MsgType::Enum Application::getLogLevel(){
-            return m_logLevel;
-        }
-
-        bool Application::isOnline() const {
-            return m_online;
-        }
-        
-        std::string Application::getAppName() const{
-            return m_appName;
-        }
-
-        int Application::getAppDescriptor(){
-            return m_appFileDesc;
-        }
-
-        bool Application::compareName(const std::string& name) {
-            if(m_appName == name){
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        Application::Application(const Application& orig) {
-            this->m_appFileDesc =orig.m_appFileDesc;
-            this->m_appName = orig.m_appName;
-        }
-
-
-        Application::~Application() {
-        }
-    } // namespace FlexLogger
+    } // namespace logger
 } // namespace flexd
+
+#endif /* FLEXDAPPARRAY_H */
 

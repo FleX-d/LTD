@@ -28,24 +28,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Author: Jakub Pekar
  */
 
-enum LogLevelsEnum {
-    HANDSHAKE = 0,
-    VERBOSE = 1,
-    DEBUG = 2,
-    INFO = 3,
-    WARN = 4,
-    ERROR = 5,
-    FATAL = 6,
-    ALL = 7
-};
 #include "iSocServer.h"
 
+// enum LogLevelsEnum {
+//     HANDSHAKE = 0,
+//     VERBOSE = 1,
+//     DEBUG = 2,
+//     INFO = 3,
+//     WARN = 4,
+//     ERROR = 5,
+//     FATAL = 6,
+//     ALL = 7
+// };
+
 iSocServer::iSocServer()
-: address(),
-opt(1),
-addrlen(sizeof (address)),
-buffer() 
-{
+: server_fd(0),
+  new_socket(0),
+  opt(1),
+  valread(0),
+  address(),
+  addrlen(sizeof (address)),
+  buffer() {
 }
 
 bool iSocServer::connectFunck(int port) {

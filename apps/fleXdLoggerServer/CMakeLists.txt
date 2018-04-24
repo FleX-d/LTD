@@ -1,15 +1,24 @@
 cmake_minimum_required(VERSION 3.0)
-project(fleXdLogger VERSION "0.0.1")
+project(fleXdLoggerServer VERSION "0.0.1")
 set(PROJECT_DESCRIPTION "Logger daemon for fleXd project")
 
 message(STATUS "***" )
 message(STATUS "*  " ${PROJECT_NAME})
 message(STATUS "***" )
 
-include_directories(${fleXdMessageTypePublicInc})
 
 include(ExternalProject)
 find_package(Git REQUIRED)
+find_package(PkgConfig)
+pkg_check_modules(FLEXDUDS REQUIRED fleXdUDS)
+pkg_check_modules(FLEXDEPOLL REQUIRED fleXdEpoll)
+pkg_check_modules(FLEXDIPCBUFFER REQUIRED fleXdIPCBuffer)
+
+include_directories(${fleXdMessageTypePublicInc}
+    ${FLEXDUDS_INCLUDE_DIRS}
+    ${FLEXDEPOLL_INCLUDE_DIRS}
+    ${FLEXDIPCBUFFER_INCLUDE_DIRS}
+)
 
 ExternalProject_Add(
     bitstream
@@ -32,22 +41,22 @@ SET(publicHeaders
 )
 
 SET(privateHeaders
-    inc/AppArray.h
-    inc/Application.h
+    inc/FleXdAppArray.h
+    inc/FleXdApplication.h
     inc/iSocServer.h
-    inc/Logger.h
-    inc/LogMessage.h
-    inc/Connector.h
+    inc/FleXdLoggerServer.h
+    inc/FleXdLogMessage.h
+    inc/FleXdConnector.h
 )
 
 SET(privateSources
-  src/AppArray.cpp
-  src/Application.cpp
+  src/FleXdAppArray.cpp
+  src/FleXdApplication.cpp
   src/iSocServer.cpp
-  src/Logger.cpp
-  src/LogMessage.cpp
-  src/mainLogger.cpp
-  src/Connector.cpp
+  src/FleXdLoggerServer.cpp
+  src/FleXdLogMessage.cpp
+  src/mainFleXdLogger.cpp
+  src/FleXdConnector.cpp
 )
 
 add_executable(${PROJECT_NAME} ${privateSources} ${privateHeaders} ${publicHeaders})
@@ -55,11 +64,14 @@ target_include_directories(${PROJECT_NAME} PUBLIC inc/public)
 target_include_directories(${PROJECT_NAME} PRIVATE inc/ ${BITSTREAM_INCLUDE_DIR})
 target_compile_options(${PROJECT_NAME} PUBLIC -std=c++14 -Wall -Wfloat-conversion)
 target_link_libraries(${PROJECT_NAME}
+    ${FLEXDUDS_LIBRARIES}
+    ${FLEXDEPOLL_LIBRARIES}
+    ${FLEXDIPCBUFFER_LIBRARIES}
 )
 
 
 install(TARGETS ${PROJECT_NAME}
     DESTINATION ${CMAKE_BINARY_DIR})
 
-add_dependencies(${PROJECT_NAME} bitstream)
+add_dependencies(${PROJECT_NAME} bitstream fleXdUDS fleXdEpoll fleXdIPCBuffer)
  

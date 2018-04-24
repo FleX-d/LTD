@@ -24,23 +24,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /* 
- * File:   mainLogger.cpp
+ * File:   FleXdMessageType.h
  * Author: Jakub Pekar
  */
 
-#include "Logger.h"
+#ifndef FLEXDMESSAGETYPE_H
+#define FLEXDMESSAGETYPE_H
+
+namespace flexd {
+    namespace logger {
+        namespace MsgType {
+            /*
+             *  Definition of message type for FleXdLogger client <-> server communication
+             */
+            enum Enum {         
+                HANDSHAKE = 0x00,
+                VERBOSE,
+                DEBUG,
+                INFO,
+                WARN,
+                ERROR,
+                FATAL,
+                SETLOGLEVEL,
+
+                SETLOGLEVELACKSUCCES = 0xFB,
+                SETLOGLEVELACKFAIL = 0xFC,
+                HANDSHAKESUCCES  = 0xFD,   // system message confirming the correct name
+                HANDSHAKEFAIL = 0xFE, // answer if is name incorrect 
+                UNDEFINED = 0XFF
+            };
+        } // namespace MsgType
+    } // namespace logger
+} // namespace flexd    
 
 
-int main(int argc, char** argv) {
-    int clientDesc;
-    flexd::FlexLogger::Logger logger;
-    while(true){
-        clientDesc = logger.handshake();
-        if(clientDesc > 0){
-            logger.loggingFunc(clientDesc);
-    
-        }
-    }
-    return 0;
-}
+#endif /* FLEXDMESSAGETYPE_H */
 

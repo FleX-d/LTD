@@ -24,47 +24,70 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /* 
- * File:   Application.h
+ * File:   FleXdApplication.cpp
  * Author: Jakub Pekar
  */
 
-#ifndef APPLICATION_H
-#define APPLICATION_H
 
-#include "MessageType.h"
-#include <cstring>
-#include <iostream>
-#include <stdint.h>
+#include "FleXdApplication.h"
 
 namespace flexd {
-    namespace FlexLogger {
+    namespace logger {
 
-        class Application {
+        Application::Application(const std::string& appName, int appDescriptor)
+        : m_appName(appName),      
+          m_appFileDesc(appDescriptor),
+          m_online(true),
+          m_logLevel(MsgType::Enum::VERBOSE){
+        }
+        void Application::setOnline() {
+            m_online = true;
+        }
 
-        public:
-            Application(const std::string& appName, int appDescriptor); // Set default loglevel
-            Application(const Application& orig);
-            virtual ~Application();
-            void setLogLevel(MsgType::Enum logLevel);
-            void setOnline();
-            void setOffline();
-            void setAppDescriptor(int appFileDescriptor);
-            std::string getAppName()const;
-            int getAppDescriptor();
-            MsgType::Enum getLogLevel();
-            bool isOnline() const;
-            bool compareName(const std::string& name);
-            
-        private:
-            std::string m_appName;
-            int m_appFileDesc;
-            bool m_online; // represent if app is active or not
-            MsgType::Enum m_logLevel;
-        };
+        void Application::setOffline() {
+            m_online = false;
+        }
+        void Application::setAppDescriptor(int appFileDescriptor) {
+            m_appFileDesc = appFileDescriptor;
+        }
+        void Application::setLogLevel(MsgType::Enum logLevel) {
+            m_logLevel = logLevel;
+        }
+
+
+        MsgType::Enum Application::getLogLevel(){
+            return m_logLevel;
+        }
+
+        bool Application::isOnline() const {
+            return m_online;
+        }
         
-    } // namespace FlexLogger
+        std::string Application::getAppName() const{
+            return m_appName;
+        }
+
+        int Application::getAppDescriptor(){
+            return m_appFileDesc;
+        }
+
+        bool Application::compareName(const std::string& name) {
+            if(m_appName == name){
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        Application::Application(const Application& orig) {
+            this->m_appFileDesc =orig.m_appFileDesc;
+            this->m_appName = orig.m_appName;
+        }
+
+
+        Application::~Application() {
+        }
+        
+    } // namespace logger
 } // namespace flexd
-
-
-#endif /* APPLICATION_H */
 

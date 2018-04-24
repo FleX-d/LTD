@@ -5,20 +5,20 @@
  */
 
 /* 
- * File:   Connector.h
+ * File:   FleXdConnector.h
  * Author: dev
  *
  * Created on April 13, 2018, 1:03 PM
  */
 
-#ifndef CONNECTOR_H
-#define CONNECTOR_H
+#ifndef FLEXDCONNECTOR_H
+#define FLEXDCONNECTOR_H
 
 #include "FleXdEpoll.h"
 #include "FleXdUDSServer.h"
 
 namespace flexd {
-    namespace FlexLogger {
+    namespace logger {
 
         class Connector : public flexd::ilc::epoll::FleXdUDSServer 
         {
@@ -39,9 +39,9 @@ namespace flexd {
 
         };
 
-    } // namespace FlexLogger
+    } // namespace logger
 } // namespace flexd       
 
 
-#endif /* CONNECTOR_H */
+#endif /* FLEXDCONNECTOR_H */
 

@@ -24,12 +24,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /* 
- * File:   LogMessage.h
+ * File:   FleXdLogMessage.h
  * Author: Jakub Pekar
  */
 
-#ifndef LOGMESSAGE_H
-#define LOGMESSAGE_H
+#ifndef FLEXDLOGMESSAGE_H
+#define FLEXDLOGMESSAGE_H
 
 #include <BitStream.h>
 #include <iostream>
@@ -38,7 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <chrono>
 
 namespace flexd {
-    namespace FlexLogger {
+    namespace logger {
+        
         class LogMessage : public BiteStream {
         public:
             LogMessage(std::vector<uint8_t>&& data);
@@ -62,7 +63,7 @@ namespace flexd {
             static const uint8_t offSet_logMessage = 112;
             
         };
-    } // namespace FlexLogger
+    } // namespace logger
 } // namespace flexd
-#endif /* LOGMESSAGE_H */
+#endif /* FLEXDLOGMESSAGE_H */
 

@@ -43,3 +43,16 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 - Makefile which was unknowingly pushed to GitHub
+
+## [0.0.1] - 2018-04-24 [Martin Strenger]
+### Added
+- None
+
+### Changed
+- Renamed header and source files
+- Corrected CMakeLists
+- Renamed classes and namespaces
+- Resolved compilation warnings
+
+### Removed
+- None

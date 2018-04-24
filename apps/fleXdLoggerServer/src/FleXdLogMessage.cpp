@@ -24,7 +24,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /* 
- * File:   LogMessage.cpp
+ * File:   FleXdLogMessage.cpp
  * Author: Jakub Pekar
  */
 
@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <syslog.h>
 #include <deque>
-#include "LogMessage.h"
+#include "FleXdLogMessage.h"
 
 namespace flexd {
-    namespace FlexLogger {
+    namespace logger {
 
         /*Creating of logMessage from bitstream*/
         LogMessage::LogMessage(std::vector<uint8_t>&& data)
@@ -88,5 +88,5 @@ namespace flexd {
             std::vector<uint8_t> data = this->getRest();
             return std::string(data.begin(),data.end());
         }
-    } // namespace FlexLogger
+    } // namespace logger
 } // namespace flexd

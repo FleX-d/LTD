@@ -24,42 +24,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /* 
- * File:   AppArray.h
+ * File:   FleXdApplication.h
  * Author: Jakub Pekar
  */
 
-#ifndef APPARRAY_H
-#define APPARRAY_H
+#ifndef FLEXDAPPLICATION_H
+#define FLEXDAPPLICATION_H
 
-#include <vector>
-#include <memory>
-#include "Application.h"
+#include "FleXdMessageType.h"
+#include <cstring>
+#include <iostream>
+#include <stdint.h>
+
 namespace flexd {
-    namespace FlexLogger {
+    namespace logger {
 
-        class AppArray {
-            typedef std::array<std::shared_ptr<Application>, 65536> appVec;
+        class Application {
+
         public:
-            AppArray();
-            virtual ~AppArray();
+            Application(const std::string& appName, int appDescriptor); // Set default loglevel
+            Application(const Application& orig);
+            virtual ~Application();
+            void setLogLevel(MsgType::Enum logLevel);
+            void setOnline();
+            void setOffline();
+            void setAppDescriptor(int appFileDescriptor);
+            std::string getAppName()const;
+            int getAppDescriptor();
+            MsgType::Enum getLogLevel();
+            bool isOnline() const;
+            bool compareName(const std::string& name);
             
-            int insertToArray(const std::string& appName, int descriptor);              
-            bool removeFromArray(int descriptor);
-            bool unconnectApplication(int desctiptor);
-            std::string getAppName(uint16_t appID) const;
-            const std::shared_ptr<Application> getApp(const std::string& appName)const;
-            
-            AppArray(const AppArray& orig) = delete;
         private:
-            appVec m_list;
-            appVec::iterator m_pos;
-            uint16_t m_countOfConnectedApp;
-            
-            
-
+            std::string m_appName;
+            int m_appFileDesc;
+            bool m_online; // represent if app is active or not
+            MsgType::Enum m_logLevel;
         };
-    } // namespace FlexLogger
+        
+    } // namespace logger
 } // namespace flexd
 
-#endif /* APPARRAY_H */
+
+#endif /* FLEXDAPPLICATION_H */
 
