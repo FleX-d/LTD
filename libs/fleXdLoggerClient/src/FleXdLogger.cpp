@@ -32,8 +32,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FleXdLogger.h"
 #include "iSocClient.h"
 #include "FleXdLogStream.h"
+#include "FleXdMessageType.h"
 #include <chrono>
 #include <iostream>
+
+namespace {
+    flexd::logger::MsgType::Enum logLevelToMsgType(flexd::logger::LogLevel::Enum logLevel) {
+        switch (logLevel)
+        {
+            case flexd::logger::LogLevel::Enum::VERBOSE:
+                return flexd::logger::MsgType::Enum::VERBOSE;
+            case flexd::logger::LogLevel::Enum::DEBUG:
+                return flexd::logger::MsgType::Enum::DEBUG;
+            case flexd::logger::LogLevel::Enum::INFO:
+                return flexd::logger::MsgType::Enum::INFO;
+            case flexd::logger::LogLevel::Enum::WARN:
+                return flexd::logger::MsgType::Enum::WARN;
+            case flexd::logger::LogLevel::Enum::ERROR:
+                return flexd::logger::MsgType::Enum::ERROR;
+            case flexd::logger::LogLevel::Enum::FATAL:
+                return flexd::logger::MsgType::Enum::FATAL;
+            default:
+                //TODO: default value
+                return flexd::logger::MsgType::Enum::ERROR;
+        }
+    }
+}
 
 namespace flexd {
     namespace logger {
@@ -43,7 +67,7 @@ namespace flexd {
         {   
             m_address ="127.0.0.1";
             m_port = 15000;
-            m_flexLogLevel = MsgType::Enum::VERBOSE;
+            m_flexLogLevel = LogLevel::Enum::VERBOSE;
             m_msgCount = 0;
             m_appIDuint = 0;
             m_appName = "";
@@ -66,7 +90,7 @@ namespace flexd {
             }
         }
         
-        void FleXdLogger::sendLog(const MsgType::Enum logLevel, const std::stringstream&& stream, time_t time){          
+        void FleXdLogger::sendLog(const LogLevel::Enum logLevel, const std::stringstream&& stream, time_t time){          
             if (logLevel <= m_flexLogLevel){  
                 bool decreaseCounter =  false;
                 if (!m_appName.compare("")){
@@ -74,7 +98,7 @@ namespace flexd {
                     decreaseCounter = true;
                 }
                
-                LogStream logStream(m_appIDuint, time, m_flexLogLevel, m_msgCount, std::move(stream));
+                LogStream logStream(m_appIDuint, time, logLevelToMsgType(m_flexLogLevel), m_msgCount, std::move(stream));
                 std::vector<uint8_t> streamVector = logStream.releaseData();
                 m_communicator->send(streamVector.data(), streamVector.size());
                 m_msgCount++;

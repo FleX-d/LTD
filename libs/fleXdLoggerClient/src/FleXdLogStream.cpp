@@ -24,7 +24,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /* 
- * File:   LogStream.cpp
+ * File:   FleXdLogStream.cpp
  * Author: Branislav Podkonicky
  *
  * Created on March 15, 2018, 12:44 PM

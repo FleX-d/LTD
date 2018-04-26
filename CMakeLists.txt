@@ -22,3 +22,23 @@ message(STATUS "option ENABLE_TESTS=" ${ENABLE_TESTS})
 
 add_subdirectory(libs)
 add_subdirectory(apps)
+
+include(ExternalProject)
+find_package(Git REQUIRED)
+
+ExternalProject_Add(
+    bitstream
+    PREFIX ${CMAKE_BINARY_DIR}/ext
+    GIT_REPOSITORY https://github.com/AdrianPeniak/bitstream.git
+    TIMEOUT 10
+    #UPDATE_COMMAND ${GIT_EXECUTABLE} pull
+    UPDATE_COMMAND ""
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND ""
+    LOG_DOWNLOAD ON
+)
+
+ExternalProject_Get_Property(bitstream source_dir)
+set(BITSTREAM_INCLUDE_DIR ${source_dir}/lib CACHE INTERNAL "Path to include folder for bitstream")
+message(STATUS "BITSTREAM_INCLUDE_DIR:" ${BITSTREAM_INCLUDE_DIR})

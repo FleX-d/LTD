@@ -56,3 +56,16 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 - None
+
+## [0.0.1] - 2018-04-26 [Martin Strenger]
+### Added
+- None
+
+### Changed
+- Rollback of FleXdLogger.h (FleXdLoggerClient.h -> FleXdLogger.h)
+- Corrected CMakeLists
+- Corrected comments
+
+### Removed
+- Removed FleXdLoggerClient.h (duplicate of FleXdLogger.h) from FleXdLoggerClient
+- Removed main.cpp from FleXdLoggerClient

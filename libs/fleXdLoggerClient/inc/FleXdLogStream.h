@@ -24,18 +24,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /* 
- * File:   LogStream.h
+ * File:   FleXdLogStream.h
  * Author: Branislav Podkonicky
  *
  * Created on March 15, 2018, 12:44 PM
  */
 
-#ifndef LOGSTREAM_H
-#define LOGSTREAM_H
+#ifndef FLEXDLOGSTREAM_H
+#define FLEXDLOGSTREAM_H
 
 #include <BitStream.h>
-#include "FleXdMessageType.h"
 #include <sstream>
+#include "FleXdMessageType.h"
 
 namespace flexd {
     namespace logger {
@@ -64,5 +64,5 @@ namespace flexd {
     } // namespace logger
 } // namespace flexd
 
-#endif /* LOGSTREAM_H */
+#endif /* FLEXDLOGSTREAM_H */
 

@@ -25,31 +25,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* 
  * File:   FleXdLogger.h
-
  * Author: Jakub Pekar, Branislav Podkonicky
  */
 
 #ifndef FLEXDLOGGER_H
 #define FLEXDLOGGER_H
 
-#include "FleXdMessageType.h"
+
 #include <algorithm>
 #include <thread>
 #include <sstream>
 
+
 #define FLEX_LOG_TRACE(...)  \
-    flexd::logger::FleXdLogger::instance().log(flexd::logger::MsgType::Enum::TRACE, "trace", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
+    flexd::logger::FleXdLogger::instance().log(flexd::logger::LogLevel::Enum::VERBOSE, "trace", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
 #define FLEX_LOG_DEBUG(...)  \
-    flexd::logger::FleXdLogger::instance().log(flexd::logger::MsgType::Enum::DEBUG, "debug", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
+    flexd::logger::FleXdLogger::instance().log(flexd::logger::LogLevel::Enum::DEBUG, "debug", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
 #define FLEX_LOG_INFO(...)  \
-    flexd::logger::FleXdLogger::instance().log(flexd::logger::MsgType::Enum::INFO, "info", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
+    flexd::logger::FleXdLogger::instance().log(flexd::logger::LogLevel::Enum::INFO, "info", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
 #define FLEX_LOG_WARN(...)  \
-    flexd::logger::FleXdLogger::instance().log(flexd::logger::MsgType::Enum::WARN, "warning", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
+    flexd::logger::FleXdLogger::instance().log(flexd::logger::LogLevel::Enum::WARN, "warning", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
 #define FLEX_LOG_ERROR(...)  \
-    flexd::logger::FleXdLogger::instance().log(flexd::logger::MsgType::Enum::ERROR, "error", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
+    flexd::logger::FleXdLogger::instance().log(flexd::logger::LogLevel::Enum::ERROR, "error", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
 #define FLEX_LOG_FATAL(...)  \
-    flexd::logger::FleXdLogger::instance().log(flexd::logger::MsgType::Enum::FATAL, "fatal", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
-#define FLEX_LOG_NAME_INIT(...)  \
+    flexd::logger::FleXdLogger::instance().log(flexd::logger::LogLevel::Enum::FATAL, "fatal", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
+#define FLEX_LOG_INIT(...)  \
     flexd::logger::FleXdLogger::instance().setAppName(__VA_ARGS__);
 
 class iSocClient;
@@ -57,23 +57,23 @@ class iSocClient;
 namespace {
 
     template<typename T_head>
-    void FlexLog(std::stringstream& ss, T_head& head) {
+    void FleXdLog(std::stringstream& ss, T_head& head) {
         ss << head;
     }
 
     template<typename T_head, typename... T_tail>
-    void FlexLog(std::stringstream& ss, T_head& head, T_tail&... tail) {
-        FlexLog(ss, head);
-        FlexLog(ss, tail...);
+    void FleXdLog(std::stringstream& ss, T_head& head, T_tail&... tail) {
+        FleXdLog(ss, head);
+        FleXdLog(ss, tail...);
     }
 
     template<>
-    void FlexLog<uint8_t>(std::stringstream& ss, uint8_t& head) {
+    void FleXdLog<uint8_t>(std::stringstream& ss, uint8_t& head) {
         ss << std::to_string((int) head);
     }
 
     template<>
-    void FlexLog<bool>(std::stringstream& ss, bool& head) {
+    void FleXdLog<bool>(std::stringstream& ss, bool& head) {
         if (head) {
             ss << "true";
         } else {
@@ -85,6 +85,18 @@ namespace {
 namespace flexd {
     namespace logger {
         
+        namespace LogLevel {
+            enum Enum {
+                VERBOSE,
+                DEBUG,
+                INFO,
+                WARN,
+                ERROR,
+                FATAL
+                // TODO other types of message
+            };
+        }
+        
         class FleXdLogger {
             
         public:
@@ -93,9 +105,9 @@ namespace flexd {
             
             static FleXdLogger& instance();
             template<typename... T>
-            void log(MsgType::Enum logLevel, std::string level, std::thread::id threadId, std::time_t time, T... logs) {
+            void log(LogLevel::Enum logLevel, std::string level, std::thread::id threadId, std::time_t time, T... logs) {
                 std::stringstream ss;
-                FlexLog(ss, logs...);
+                FleXdLog(ss, logs...);
                 sendLog(logLevel, std::move(ss), time);
             }
             
@@ -104,7 +116,7 @@ namespace flexd {
             void operator=(FleXdLogger const&) = delete;
         private:
             void initLogger();
-            void sendLog(const MsgType::Enum logLevel, const std::stringstream&& stream, std::time_t time);
+            void sendLog(const LogLevel::Enum logLevel, const std::stringstream&& stream, std::time_t time);
             void handshake();
             
             std::string randomString( size_t length ) const;
@@ -114,14 +126,15 @@ namespace flexd {
             int m_port;
             std::string m_appName;
             uint16_t m_appIDuint;
-            MsgType::Enum m_flexLogLevel;
+            LogLevel::Enum m_flexLogLevel;
             std::unique_ptr<iSocClient> m_communicator;
             uint8_t m_msgCount;
             
             
         };
-    } // namespace FlexLogger
+
+    } // namespace logger
 } // namespace flexd
 
-#endif /* LOGGER_H */
+#endif /* FLEXDLOGGER_H */
 
