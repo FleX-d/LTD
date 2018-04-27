@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstdlib>
 #include <FleXdLogger.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -40,8 +41,13 @@ using namespace std;
  */
 int main(int argc, char** argv) {
 
-    FLEX_LOG_INIT("Application");
-    FLEX_LOG_DEBUG("This is ALL log");
+    FLEX_LOG_INIT("Application5");
+    //std::string pom;
+    //std::getline(std::cin,pom);
+    FLEX_LOG_DEBUG(" -> This is ALL log");
+    FLEX_LOG_INFO(" -> This is info log  from client ");
+    FLEX_LOG_FATAL(" -> This is fatal error . That is very big problem.");
+    FLEX_LOG_ERROR(" -> This is error smaller problem. ");
     
     return 0;
 }

@@ -49,6 +49,7 @@ public:
     bool send(void *pBuffer, uint16_t pSize);
     int recv(int pDescriptor, void* pBuffer, uint16_t pSize);
     int recv(void* pBuffer, uint16_t pSize);
+    void closeSocket();
     ~iSocClient();
     
 private:

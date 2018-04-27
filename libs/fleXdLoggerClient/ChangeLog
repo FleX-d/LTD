@@ -3,12 +3,24 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [0.0.1] - 2018-04-24
+## [0.0.1] - 2018-04-24 [Jakub Pekar]
 ### Added
-- Initial version [Jakub Pekar]
+- Initial version 
 
 ### Changed
 - None
+
+### Removed
+- None  
+
+## [0.0.1] - 2018-04-27 [Jakub Pekar]
+### Added
+- None
+
+### Changed
+- Solution for offline logging to console
+- repair bugs in Socket class
+- modification connection to server and editing some messeges
 
 ### Removed
 - None  

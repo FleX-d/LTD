@@ -30,25 +30,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "iSocClient.h"
-
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netdb.h> 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <netdb.h> 
 #include <cerrno>
 #include <stdbool.h>
-
-#include <stdio.h>
-#include <sys/socket.h>
-#include <stdlib.h>
-#include <netinet/in.h>
-#include <string.h>
-#include <arpa/inet.h>
-
 #include <iostream>
 
 iSocClient::iSocClient() {
@@ -108,7 +99,11 @@ bool iSocClient::send(void* pBuffer, uint16_t pSize) {
         perror("ERROR-send:");
         return false;
     }
+    usleep(100000);                         // waiting 100 millisec because , without that it push all logs in one buffer 
     return true;
+}
+void iSocClient::closeSocket(){
+    close(sock);
 }
 
 iSocClient::~iSocClient() {

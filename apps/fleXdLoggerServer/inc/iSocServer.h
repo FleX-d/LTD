@@ -59,7 +59,7 @@ public:
     bool listenServer();
     int connectClient();
     bool send(int descriptor, void* buffer, uint16_t size);
-    int recv(int descriptor, void* buffer, uint16_t size);
+    int receive(int descriptor, void* buffer, uint16_t size);
     void printSocketfd();
     
 private:

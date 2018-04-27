@@ -30,21 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "iSocServer.h"
 
-// enum LogLevelsEnum {
-//     HANDSHAKE = 0,
-//     VERBOSE = 1,
-//     DEBUG = 2,
-//     INFO = 3,
-//     WARN = 4,
-//     ERROR = 5,
-//     FATAL = 6,
-//     ALL = 7
-// };
-
 iSocServer::iSocServer()
 : server_fd(0),
   new_socket(0),
-  opt(1),
+  opt(0),
   valread(0),
   address(),
   addrlen(sizeof (address)),
@@ -59,8 +48,7 @@ bool iSocServer::connectFunck(int port) {
     }
 
     // Forcefully attaching socket to the port 8080
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT,
-            &opt, sizeof (opt))) {
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof (opt))) {
         perror("setsockopt");
         return false;
     }
@@ -68,7 +56,6 @@ bool iSocServer::connectFunck(int port) {
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(port);
 
-    // Forcefully attaching socket to the port 8080
     if (bind(server_fd, (struct sockaddr *) &address,
             sizeof (address)) < 0) {
         perror("bind failed");
@@ -80,7 +67,7 @@ bool iSocServer::connectFunck(int port) {
 
 bool iSocServer::listenServer() {
 
-    if (listen(server_fd, 3) < 0) {
+    if (listen(server_fd, 10) < 0) {
         perror("listen");
         return false;
     }
@@ -90,16 +77,15 @@ bool iSocServer::listenServer() {
 int iSocServer::connectClient() {
     int socket = 0;
 
-    if ((socket = accept(server_fd, (struct sockaddr *) &address,
-            (socklen_t*) & addrlen)) < 0) {
+    if ((socket = accept(server_fd, (struct sockaddr *) &address, (socklen_t*) & addrlen)) < 0) {
         perror("accept");
         exit(EXIT_FAILURE);
     }
     return socket;
 }
 
-int iSocServer::recv(int descriptor, void* buffer, uint16_t size) {
-    valread = read(descriptor, buffer, size);
+int iSocServer::receive(int descriptor, void* buffer, uint16_t size) {
+    valread = recv(descriptor, buffer, size,0);
     if (valread < 0) {
         std::perror("ERROR:");
         return valread;

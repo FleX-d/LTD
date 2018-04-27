@@ -25,7 +25,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* 
  * File:   FleXdLogger.h
- * Author: Jakub Pekar, Branislav Podkonicky
+ * Author: Jakub Pekar 
+ * Author: Branislav Podkonicky
  */
 
 #ifndef FLEXDLOGGER_H
@@ -35,10 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 #include <thread>
 #include <sstream>
+#include <iostream>
 
 
 #define FLEX_LOG_TRACE(...)  \
-    flexd::logger::FleXdLogger::instance().log(flexd::logger::LogLevel::Enum::VERBOSE, "trace", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
+    flexd::logger::FleXdLogger::instance().log(flexd::logger::LogLevel::Enum::VERBOSE, "verbose", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
 #define FLEX_LOG_DEBUG(...)  \
     flexd::logger::FleXdLogger::instance().log(flexd::logger::LogLevel::Enum::DEBUG, "debug", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
 #define FLEX_LOG_INFO(...)  \
@@ -87,7 +89,7 @@ namespace flexd {
         
         namespace LogLevel {
             enum Enum {
-                VERBOSE,
+                VERBOSE = 0x00,
                 DEBUG,
                 INFO,
                 WARN,
@@ -108,7 +110,11 @@ namespace flexd {
             void log(LogLevel::Enum logLevel, std::string level, std::thread::id threadId, std::time_t time, T... logs) {
                 std::stringstream ss;
                 FleXdLog(ss, logs...);
-                sendLog(logLevel, std::move(ss), time);
+                if(m_connectionToServer){
+                    sendLog(logLevel, std::move(ss), time);
+                } else {
+                    std::cout << "FleXdLogger::[" << m_appName << "][" << m_appIDuint << "][" << time <<"][" << level << "] : " << ss.str() << std::endl;
+                }
             }
             
             void setAppName(const std::string appID);
@@ -117,12 +123,13 @@ namespace flexd {
         private:
             void initLogger();
             void sendLog(const LogLevel::Enum logLevel, const std::stringstream&& stream, std::time_t time);
-            void handshake();
+            bool handshake();
             
             std::string randomString( size_t length ) const;
             
         private:
             std::string m_address;
+            bool m_connectionToServer;
             int m_port;
             std::string m_appName;
             uint16_t m_appIDuint;

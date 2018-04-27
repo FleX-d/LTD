@@ -58,24 +58,28 @@ namespace flexd {
             writeLog("FleXdLoggerServer",0,"INFO"," -> Client connected");
 
             /*Handshake and generate of appID*/
-            valread = m_socServer->recv(client, buffer, 1024);
+            valread = m_socServer->receive(client, buffer, 1024);
             std::vector<uint8_t>dataBuffer(buffer, buffer + valread);
             if (valread) {
             FleXdLogMessage initmessage(std::move(dataBuffer)); //create log init message
-            uint16_t appId = m_arrayOfApp.insertToArray(initmessage.getLogMessage(), client);
+            int appId = m_arrayOfApp.insertToArray(initmessage.getLogMessage(), client);
 
                 if (appId > 0) {
-                    FleXdLogMessage ackMessage(appId, (uint8_t) MsgType::Enum::HANDSHAKESUCCES, 0, std::to_string(appId));
-                    std::cout << "*ACKMESSAGE*-> ";
+                    FleXdLogMessage ackMessage((uint16_t)appId, (uint8_t) MsgType::Enum::HANDSHAKESUCCES, 0, std::to_string(appId));
+                    std::cout << "*ACKMESSAGE* -> ";
                     ackMessage.logToCout();
+                    writeLog("FleXdLoggerServer",0,"VERBOSE",std::string(" -> Ack successful. *")+ m_arrayOfApp.getAppName(appId) + std::string("* has appID ") + std::to_string(appId));
                 
                     std::vector<uint8_t> streamVector = ackMessage.releaseData();
                     m_socServer->send(client, streamVector.data(), streamVector.size());
-                    return appId;
+                    
+                    //TODO when it will be implement IPC or something other it will be return the appId
+                    return client;
                 } else if (appId == -1) {
                     FleXdLogMessage ackMessage(appId, (uint8_t) MsgType::Enum::HANDSHAKEFAIL, 0, std::string("***This application name using other client***"));
                     std::cout << "*ACKMESSAGE*-> ";
                     ackMessage.logToCout();
+                    writeLog("FleXdLoggerServer",0,"VERBOSE",std::string(" -> Handshake problem. This name is using."));
                     std::vector<uint8_t> streamVector = ackMessage.releaseData();
                     m_socServer->send(client, streamVector.data(), streamVector.size());
                     return -1;
@@ -97,7 +101,7 @@ namespace flexd {
 
             while (true) 
             {
-                valread = m_socServer->recv(client, buffer, 1024);
+                valread = m_socServer->receive(client, buffer, 1024);
                 std::vector<uint8_t> dataBuffer(buffer, buffer + valread);
                 if (valread) 
                 {
@@ -105,6 +109,7 @@ namespace flexd {
                     message.logToCout();
                     logToSysLog(message);
                 } else {
+                    std::cout << "Client is unconnected!"<< std::endl;
                     m_arrayOfApp.unconnectApplication(client);
                     close(client);
                     break;
@@ -168,7 +173,7 @@ namespace flexd {
                 
                 //Recv acknowledge about syslog setting 
                 char buffer[128];
-                int valread = m_socServer->recv(app->getAppDescriptor(),buffer, 128);
+                int valread = m_socServer->receive(app->getAppDescriptor(),buffer, 128);
                 std::vector<uint8_t>dataBuffer(buffer, buffer + valread);
                 if(valread > 0)
                 {
@@ -178,7 +183,7 @@ namespace flexd {
                        return true;
                    }
                 }
-                writeLog("FleXdLoggerServer",0,"WARN","Can`t set log level on: " + appName );
+                writeLog("FleXdLoggerServer",0,"WARN"," -> Can`t set log level on: " + appName );
                 return false;
                 
             }

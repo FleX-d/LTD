@@ -69,3 +69,14 @@ All notable changes to this project will be documented in this file.
 ### Removed
 - Removed FleXdLoggerClient.h (duplicate of FleXdLogger.h) from FleXdLoggerClient
 - Removed main.cpp from FleXdLoggerClient
+
+## [0.0.1] - 2018-04-27 [Jakub Pekar]
+### Added
+- None
+
+### Changed
+- Dividin function in class object to more functions
+-repairing some bugs in code in Socket class and FleXdLoggerServer class
+
+### Removed
+- None

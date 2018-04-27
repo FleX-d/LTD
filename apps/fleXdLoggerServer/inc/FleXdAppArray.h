@@ -51,12 +51,15 @@ namespace flexd {
             bool unconnectApplication(int desctiptor);
             std::string getAppName(uint16_t appID) const;
             const std::shared_ptr<FleXdApplication> getApp(const std::string& appName)const;
-            
+        private:
+            int insertToArray(std::function<void(appVec::iterator)> funcSwapingPointer);
+            int insertToOverFlowArray(std::function<void(appVec::iterator)> funcSwapingPointer);
             FleXdAppArray(const FleXdAppArray& orig) = delete;
         private:
             appVec m_list;
             appVec::iterator m_pos;
-            uint16_t m_countOfConnectedApp;
+            uint16_t m_countOfCreatedApp;
+            bool m_rangeOverFlow;
 
         };
 

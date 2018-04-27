@@ -37,9 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 namespace {
+
     flexd::logger::MsgType::Enum logLevelToMsgType(flexd::logger::LogLevel::Enum logLevel) {
-        switch (logLevel)
-        {
+        switch (logLevel) {
             case flexd::logger::LogLevel::Enum::VERBOSE:
                 return flexd::logger::MsgType::Enum::VERBOSE;
             case flexd::logger::LogLevel::Enum::DEBUG:
@@ -62,104 +62,104 @@ namespace {
 namespace flexd {
     namespace logger {
 
-        FleXdLogger::FleXdLogger() :
-            m_communicator(new iSocClient())
-        {   
-            m_address ="127.0.0.1";
-            m_port = 15000;
-            m_flexLogLevel = LogLevel::Enum::VERBOSE;
-            m_msgCount = 0;
-            m_appIDuint = 0;
-            m_appName = "";
+        FleXdLogger::FleXdLogger()
+        :
+        m_address("127.0.0.1"),
+                m_connectionToServer(false),
+        m_port(15000),
+        m_appName(""),
+        m_appIDuint(0),
+        m_flexLogLevel(LogLevel::Enum::VERBOSE),
+        m_communicator(new iSocClient()),
+        m_msgCount(0) {
+
         }
-        
-        FleXdLogger& FleXdLogger::instance() {
+
+        FleXdLogger& FleXdLogger::instance() 
+        {
             static FleXdLogger INSTANCE;
             return INSTANCE;
         }
 
-        void FleXdLogger::initLogger() {
-            m_communicator->connectF((char*)m_address.c_str(),m_port);
-            handshake();
+        void FleXdLogger::initLogger() 
+        {
+            if(!(m_communicator->connectF((char*) m_address.c_str(), m_port))){
+                m_connectionToServer = false;
+            } else {
+                if(handshake()){
+                    m_connectionToServer = true;
+                    std::cout <<  "FleXdLogger::->  Logging to ServerLogger." << std::endl; 
+                } else {                                   // Loop which cycles when the handshake is not successful
+                    m_connectionToServer = false;
+                }
+            }
         }
 
         void FleXdLogger::setAppName(const std::string appName) {
-            if (!this->m_appName.compare("")){
+            if (!this->m_appName.compare("")) {
                 this->m_appName = appName;
                 initLogger();
             }
         }
-        
-        void FleXdLogger::sendLog(const LogLevel::Enum logLevel, const std::stringstream&& stream, time_t time){          
-            if (logLevel <= m_flexLogLevel){  
-                bool decreaseCounter =  false;
-                if (!m_appName.compare("")){
-                    this->setAppName(randomString(size_t(8)));
-                    decreaseCounter = true;
-                }
-               
-                LogStream logStream(m_appIDuint, time, logLevelToMsgType(m_flexLogLevel), m_msgCount, std::move(stream));
+
+        void FleXdLogger::sendLog(const LogLevel::Enum logLevel, const std::stringstream&& stream, time_t time) {
+            if (logLevel >= m_flexLogLevel) {
+
+                LogStream logStream(m_appIDuint, time, logLevelToMsgType(logLevel), m_msgCount, std::move(stream));
                 std::vector<uint8_t> streamVector = logStream.releaseData();
                 m_communicator->send(streamVector.data(), streamVector.size());
                 m_msgCount++;
-                if (decreaseCounter) {
-                    m_msgCount--;
-                }
+
             }
         }
-        
-        std::string FleXdLogger::randomString( size_t length ) const
-        {
-            auto randchar = []() -> char
-        {
-            const char charset[] =
-            "0123456789"
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "abcdefghijklmnopqrstuvwxyz";
-            const size_t max_index = (sizeof(charset) - 1);
-            return charset[ rand() % max_index ];
-        };
-            std::string str(length,0);
-            std::generate_n( str.begin(), length, randchar );
+
+        std::string FleXdLogger::randomString(size_t length) const {
+            auto randchar = []() -> char {
+                const char charset[] =
+                        "0123456789"
+                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                        "abcdefghijklmnopqrstuvwxyz";
+                const size_t max_index = (sizeof (charset) - 1);
+                return charset[ rand() % max_index ];
+            };
+            std::string str(length, 0);
+            std::generate_n(str.begin(), length, randchar);
             return str;
         }
-        
-        void FleXdLogger::handshake() {
-            uint64_t time = 
-                std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-            time_t endwait;
-            time_t start = time_t(NULL);
-            time_t seconds = 10; // end loop aftFlexLoggerer this time has elapsed
-            endwait = start + seconds;
-           
+
+        bool FleXdLogger::handshake() {
+            uint64_t time =
+                    std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
             char buffer[1024];
-            
-            LogStream handshakeMessage(0, (uint64_t)time, flexd::logger::MsgType::HANDSHAKE, 0, m_appName);
+
+            LogStream handshakeMessage(0, (uint64_t) time, flexd::logger::MsgType::HANDSHAKE, 0, m_appName);
             std::vector<uint8_t> streamVector = handshakeMessage.releaseData();
             m_communicator->send(streamVector.data(), streamVector.size());
-            
+
             int valread = m_communicator->recv(buffer, 1024);
             std::vector<uint8_t> dataBuffer(buffer, buffer + valread);
-            std::cout << "Valread " << valread << std::endl;        
-            while (start < endwait)
-            {
-                start = time_t(NULL);
+            if (valread) {
+                LogStream responseStream(std::move(dataBuffer)); //create log response message
+                
 
-                if (valread) {
-                    LogStream responseStream(std::move(dataBuffer)); //create log response message
+                uint8_t msgTpe = responseStream.getMessageType();
+
+                if (msgTpe == MsgType::Enum::HANDSHAKESUCCES) {
+                    this->m_appIDuint = responseStream.getAppID();
                     responseStream.logToCout();
-            
-                    uint8_t msgTpe = responseStream.getMessageType();
+                    return true;
+                } else if (msgTpe == MsgType::Enum::HANDSHAKEFAIL) {
+                    m_communicator->closeSocket();
+                    this->setAppName(randomString(size_t(8)));
+                    responseStream.logToCout();
                     
-                    if (msgTpe == MsgType::Enum::HANDSHAKESUCCES) {
-                        this->m_appIDuint = responseStream.getAppID();
-                        break;
-                    } else if (msgTpe == MsgType::Enum::HANDSHAKEFAIL) {
-                        this->setAppName(randomString(size_t(8)));
-                    }   
-                }        
-            }          
-        }  
+                }
+            } else {
+                //TODO if unconnected socket it return false
+                return false;
+            }
+            return false;
+        }
 
     } // namespace FlexLogger
 } // namespace flexd
