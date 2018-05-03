@@ -35,9 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace flexd {
     namespace logger {
 
-        FleXdLoggerServer::FleXdLoggerServer() {
+        FleXdLoggerServer::FleXdLoggerServer(bool logToDlt /*= false*/)
+        : m_socServer(new iSocServer()),
+          m_fleXdLoggerDlt(nullptr) {
             int port = 15000;
-            m_socServer = new iSocServer();
             m_socServer->connectFunck(port);
             m_socServer->listenServer();
            
@@ -45,6 +46,10 @@ namespace flexd {
             openlog("FLEXLOGGER", LOG_CONS, LOG_LOCAL0);
             writeLog("FleXdLoggerServer",0,"INFO"," -> Init");
             
+            // Enable logging to Dlt
+            if (logToDlt) {
+                m_fleXdLoggerDlt = new FleXdLoggerDlt();
+            }
         }   
         
         int FleXdLoggerServer::handshake()
@@ -73,6 +78,11 @@ namespace flexd {
                     std::vector<uint8_t> streamVector = ackMessage.releaseData();
                     m_socServer->send(client, streamVector.data(), streamVector.size());
                     
+                    //TODO register application for Dlt logging, check the return value
+                    //if (m_fleXdLoggerDlt != nullptr) {
+                    //    m_fleXdLoggerDlt->registerApp( ... );
+                    //}
+
                     //TODO when it will be implement IPC or something other it will be return the appId
                     return client;
                 } else if (appId == -1) {
@@ -108,7 +118,15 @@ namespace flexd {
                     FleXdLogMessage message(std::move(dataBuffer));
                     message.logToCout();
                     logToSysLog(message);
+                    //TODO send log to Dlt, check the return value
+                    //if (m_fleXdLoggerDlt != nullptr) {
+                    //    m_fleXdLoggerDlt->sendLog( ... , static_cast<MsgType::Enum>(message.getMsgType()), message.getLogMessage());
+                    //}
                 } else {
+                    //TODO unregister app from Dlt logging, check the return value
+                    //if (m_fleXdLoggerDlt != nullptr) {
+                    //    m_fleXdLoggerDlt->unregisterApp( ... );
+                    //}
                     std::cout << "Client is unconnected!"<< std::endl;
                     m_arrayOfApp.unconnectApplication(client);
                     close(client);
@@ -164,6 +182,11 @@ namespace flexd {
             // don't forget write process log to syslog
             std::shared_ptr<FleXdApplication> app = m_arrayOfApp.getApp(appName);
             app->setLogLevel(logLevel);
+
+            //TODO set log level for application when Dlt logging is enabled, check the return value
+            //if (m_fleXdLoggerDlt != nullptr) {
+            //    m_fleXdLoggerDlt->setLogLevel( ... );
+            //}
  
             if(app->isOnline())
             {
@@ -195,6 +218,9 @@ namespace flexd {
    
         FleXdLoggerServer::~FleXdLoggerServer() {
             delete m_socServer;
+            if (m_fleXdLoggerDlt != nullptr) {
+                delete m_fleXdLoggerDlt;
+            }
             closelog();
         }
     } // namespace logger

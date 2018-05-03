@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FleXdMessageType.h"
 #include "FleXdAppArray.h"
 #include "FleXdLoggerIPC.h"
+#include "FleXdLoggerDlt.h"
 #include <sstream>
 #include <thread>
 #include <syslog.h>
@@ -47,7 +48,7 @@ namespace flexd {
         
         class FleXdLoggerServer {
         public:
-            FleXdLoggerServer();
+            explicit FleXdLoggerServer(bool logToDlt = false);
             virtual ~FleXdLoggerServer();
             
             bool loggingFunc(const int client);                 //logging only for one application (TODO: threads?? Or solution is IPC?)
@@ -63,6 +64,7 @@ namespace flexd {
             //TODO IPC (now it run on sockets)
             //FleXdLoggerIPC m_loggerIPC;
             iSocServer* m_socServer;
+            FleXdLoggerDlt* m_fleXdLoggerDlt;
         };
         
     } // namespace logger

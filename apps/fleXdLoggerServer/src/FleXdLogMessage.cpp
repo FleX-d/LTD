@@ -39,7 +39,7 @@ namespace flexd {
 
         /*Creating of logMessage from bitstream*/
         FleXdLogMessage::FleXdLogMessage(std::vector<uint8_t>&& data)
-        : BiteStream(std::move(data)) {
+        : BitStream(std::move(data)) {
         }
 
         FleXdLogMessage::FleXdLogMessage(uint16_t appID, uint8_t msgType, uint8_t msgCounter, std::string logMessage) {

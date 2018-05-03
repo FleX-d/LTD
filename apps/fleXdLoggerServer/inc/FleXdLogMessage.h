@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace flexd {
     namespace logger {
         
-        class FleXdLogMessage : public BiteStream {
+        class FleXdLogMessage : public BitStream {
         public:
             FleXdLogMessage(std::vector<uint8_t>&& data);
             FleXdLogMessage(uint16_t appID, uint8_t msgType, uint8_t msgCounter, std::string logMessage);

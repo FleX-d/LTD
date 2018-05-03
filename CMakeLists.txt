@@ -20,9 +20,6 @@ option(
 )
 message(STATUS "option ENABLE_TESTS=" ${ENABLE_TESTS})
 
-add_subdirectory(libs)
-add_subdirectory(apps)
-
 include(ExternalProject)
 find_package(Git REQUIRED)
 
@@ -42,3 +39,6 @@ ExternalProject_Add(
 ExternalProject_Get_Property(bitstream source_dir)
 set(BITSTREAM_INCLUDE_DIR ${source_dir}/lib CACHE INTERNAL "Path to include folder for bitstream")
 message(STATUS "BITSTREAM_INCLUDE_DIR:" ${BITSTREAM_INCLUDE_DIR})
+
+add_subdirectory(libs)
+add_subdirectory(apps)
