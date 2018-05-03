@@ -75,8 +75,20 @@ All notable changes to this project will be documented in this file.
 - None
 
 ### Changed
-- Dividin function in class object to more functions
+- Dividing function in class object to more functions
 -repairing some bugs in code in Socket class and FleXdLoggerServer class
+
+### Removed
+- None
+
+
+## [0.0.1] - 2018-05-03 [Jakub Pekar]
+### Added
+- None
+
+### Changed
+- implementation of changes in BitStream
+-
 
 ### Removed
 - None

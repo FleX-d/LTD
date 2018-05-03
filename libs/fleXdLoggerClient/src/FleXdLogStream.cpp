@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace flexd {
     namespace logger {
 
-        LogStream::LogStream(std::vector<uint8_t>&& data) : BiteStream(std::move(data)) {
+        LogStream::LogStream(std::vector<uint8_t>&& data) : BitStream(std::move(data)) {
         }
 
         LogStream::LogStream(uint16_t appID, time_t time, flexd::logger::MsgType::Enum messageType, uint8_t messageCounter, const std::string& message) {
