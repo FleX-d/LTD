@@ -7,6 +7,8 @@ message(STATUS "*  " ${PROJECT_NAME})
 message(STATUS "***" )
 
 message(STATUS "fleXdLoggerCommonPublicInc: " ${fleXdLoggerCommonPublicInc})
+message(STATUS "fleXdLoggerDltPublicInc: " ${fleXdLoggerDltPublicInc})
+message(STATUS "fleXdLoggerDltLib: " ${fleXdLoggerDltLib})
 message(STATUS "BITSTREAM_INCLUDE_DIR:" ${BITSTREAM_INCLUDE_DIR})
 
 #find_package(PkgConfig)
@@ -41,6 +43,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC inc/public)
 target_include_directories(${PROJECT_NAME} PRIVATE inc/ 
     ${BITSTREAM_INCLUDE_DIR} 
     ${fleXdLoggerCommonPublicInc}
+    ${fleXdLoggerDltPublicInc}
 #    ${FLEXDUDS_INCLUDE_DIRS}
 #    ${FLEXDEPOLL_INCLUDE_DIRS}
 #    ${FLEXDIPCBUFFER_INCLUDE_DIRS}
@@ -48,6 +51,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE inc/
 
 target_compile_options(${PROJECT_NAME} PUBLIC -std=c++14 -Wall -Wfloat-conversion)
 target_link_libraries(${PROJECT_NAME}
+    ${fleXdLoggerDltLib}
 #    ${FLEXDUDS_LIBRARIES}
 #    ${FLEXDEPOLL_LIBRARIES}
 #    ${FLEXDIPCBUFFER_LIBRARIES}
@@ -60,8 +64,8 @@ install(TARGETS ${PROJECT_NAME}
 add_dependencies(${PROJECT_NAME}
     bitstream
     fleXdLoggerCommon
+    fleXdLoggerDlt
 #    fleXdUDS
 #    fleXdEpoll
 #    fleXdIPCBuffer
 )
- 

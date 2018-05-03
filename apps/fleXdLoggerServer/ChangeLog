@@ -81,6 +81,17 @@ All notable changes to this project will be documented in this file.
 ### Removed
 - None
 
+## [0.0.1] - 2018-05-03 [Martin Strenger]
+### Added
+- Implementation od logging to Dlt
+
+### Changed
+- Dividin function in class object to more functions
+-repairing some bugs in code in Socket class and FleXdLoggerServer class
+
+### Removed
+- None
+
 
 ## [0.0.1] - 2018-05-03 [Jakub Pekar]
 ### Added

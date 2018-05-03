@@ -28,16 +28,56 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Author: Jakub Pekar
  */
 
+#include <signal.h>
+#include <memory>
 #include "FleXdLoggerServer.h"
 
+#define CMD_LOG_TO_DLT "-dlt"
+
+
+void signalHandler(int s)
+{
+    // correct exit, loggerServer will be eventually unregistered from Dlt
+    exit(1);
+}
 
 int main(int argc, char** argv) {
     int clientDesc;
-    flexd::logger::FleXdLoggerServer loggerServer;
+    std::unique_ptr<flexd::logger::FleXdLoggerServer> loggerServer;
+    bool logTodlt = false;
+    bool argError = false;
+
+    // signal handling
+    signal(SIGABRT, signalHandler);
+    signal(SIGTERM, signalHandler);
+    signal(SIGINT, signalHandler);
+
+    for (int i = 1; i < argc; ++i) { // Remember argv[0] is the path to the program, we want from argv[1] onwards
+        // TODO: Check argument duplicity
+        if (std::string(argv[i]) == CMD_LOG_TO_DLT) {
+            logTodlt = true;
+        }
+        //else if {
+        //    TODO: other future arguments
+        //}
+        else
+        {
+            argError = true;
+        }
+    }
+
+    if (argc > 1 && argError) {
+        std::cerr << "Usage: " << argv[0] << " [" CMD_LOG_TO_DLT "]" << std::endl;
+        return 1;
+    }
+
+    // Create server
+    loggerServer = std::make_unique<flexd::logger::FleXdLoggerServer>(logTodlt);
+
     while(true){
-        clientDesc = loggerServer.handshake();
+        clientDesc = loggerServer->handshake();
         if(clientDesc > 0){
-            loggerServer.loggingFunc(clientDesc);
+            loggerServer->loggingFunc(clientDesc);
     
         }
     }

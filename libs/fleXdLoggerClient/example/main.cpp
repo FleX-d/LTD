@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
     //std::string pom;
     //std::getline(std::cin,pom);
     FLEX_LOG_DEBUG(" -> This is ALL log");
-    FLEX_LOG_INFO(" -> This is info log  from client ");
+    FLEX_LOG_INFO(" -> This is info log from client ");
     FLEX_LOG_FATAL(" -> This is fatal error . That is very big problem.");
     FLEX_LOG_ERROR(" -> This is error smaller problem. ");
     
