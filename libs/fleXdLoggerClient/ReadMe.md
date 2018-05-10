@@ -21,17 +21,17 @@ Initialization macro:
 
 The logger has defined 6 types of logs:
     -trace
-        FLEX_LOG_TRACE(log)
+    FLEX_LOG_TRACE(log)
     -debug
-        FLEX_LOG_DEBUG(log)
-    -info    
-        FLEX_LOG_INFO(log)
-    -warning    
-        FLEX_LOG_WARN(log)
-    -error    
-        FLEX_LOG_ERROR(log)
-    -fatal error    
-        FLEX_LOG_FATAL(log)
+    FLEX_LOG_DEBUG(log)
+    -info
+    FLEX_LOG_INFO(log)
+    -warning
+    FLEX_LOG_WARN(log)
+    -error 
+    FLEX_LOG_ERROR(log)
+    -fatal error
+    FLEX_LOG_FATAL(log)
         
 ## Example
     
