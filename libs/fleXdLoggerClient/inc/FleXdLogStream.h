@@ -45,14 +45,44 @@ namespace flexd {
             explicit LogStream(std::vector<uint8_t>&& data);
             explicit LogStream(uint16_t appID, time_t time, flexd::logger::MsgType::Enum messageType, uint8_t messageCounter, const std::string& message);
             explicit LogStream(uint16_t appID, time_t time, flexd::logger::MsgType::Enum messageType, uint8_t messageCounter, const std::stringstream&& message);
+            explicit LogStream(LogStream&&);
             virtual ~LogStream();
+             /**
+            * Function parses the appID from BitStream
+            * @return appID from stream
+            */
             uint16_t getAppID();
+             /**
+            * Function parses the time of log from BitStream
+            * @return appID from stream
+            */
             time_t getTime();
+             /**
+            * Function parses the message type from BitStream
+            * @return message type from stream
+            */
             flexd::logger::MsgType::Enum getMessageType();
+             /**
+            * Function parses the message counter from BitStream
+            * @return message counter from stream
+            */
             uint8_t getMessageCounter();
+             /**
+            * Function parses the payload length from BitStream
+            * @return payload length from stream
+            */
             uint16_t getMessageLength();
+             /**
+            * Function parses payload from BitStream
+            * @return payload from message
+            */
             std::string getMessage();
+             /**
+            * Function parse message from BitStream to readable form and prints log to console
+            */
             virtual void logToCout();
+            
+            
 
         private:
             const static size_t appID_size = 16;

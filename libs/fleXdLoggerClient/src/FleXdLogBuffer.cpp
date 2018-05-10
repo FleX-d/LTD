@@ -24,41 +24,63 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 /* 
- * File:   iSocClient.h
+ * File:   FleXdLogBuffer.cpp
  * Author: Jakub Pekar
+ * 
+ * Created on May 3, 2018, 1:25 PM
  */
 
+#include "FleXdLogBuffer.h"
+#include "iSocClient.h"
 
-#ifndef ISOCCLIENT_H
-#define ISOCCLIENT_H
+namespace flexd {
+    namespace logger {
 
-#include <stdint.h>
-#include <stdio.h>
-#include <sys/socket.h>
-#include <stdlib.h>
-#include <netinet/in.h>
-#include <iostream>
-#include <arpa/inet.h>
+        FleXdLogBuffer::FleXdLogBuffer(size_t maxSizeBuffer)
+        : m_maxSizeBuffer(maxSizeBuffer),
+        m_sizeBuffer(0),      
+        m_queue(),
+        m_mutex()        
+        {      
+        }
+        
+        uint32_t FleXdLogBuffer::getSizeBuffer() {
+            return m_sizeBuffer;
+        }
 
-class iSocClient {
-    
-public:
-    iSocClient();
-    iSocClient(const iSocClient& orig) = default;
-    bool connectF();
-    int send(void *pBuffer, uint16_t pSize);
-    int recv(int pDescriptor, void* pBuffer, uint16_t pSize);
-    int recv(void* pBuffer, uint16_t pSize);
-    void closeSocket();
-    ~iSocClient();
-    
-private:
-    std::string m_address;
-    int m_port;
-    sockaddr_in serv_addr;
-    sockaddr_in address;
-    int sock;
-};
 
-#endif /* ISOCCLIENT_H */
+        LogStream& FleXdLogBuffer::getStream() {
+            if (m_sizeBuffer > 0){
+               return m_queue.front();
+            }
+        }
+        
+        bool FleXdLogBuffer::pop() {
+            std::lock_guard<std::mutex> bufferLock(m_mutex);
+            if (m_sizeBuffer > 0){
+                m_sizeBuffer -= m_queue.front().getMessageLength();
+                m_queue.pop();
+                return true;
+            }
+            return false;
+        }
 
+        
+        bool FleXdLogBuffer::push(LogStream&& logStream) {
+            std::lock_guard<std::mutex> bufferLock(m_mutex);
+            m_sizeBuffer += logStream.getMessageLength();// TODO getMessageLength return only size of payload without the header
+            if (m_sizeBuffer < m_maxSizeBuffer){
+                m_queue.push(std::move(logStream));
+                
+                return true;
+            }else {
+                m_sizeBuffer -= logStream.getMessageLength();
+            }
+            return false;
+        }
+
+
+
+
+    } // namespace FlexLogger
+} // namespace flexd

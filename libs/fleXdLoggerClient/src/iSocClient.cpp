@@ -42,11 +42,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdbool.h>
 #include <iostream>
 
-iSocClient::iSocClient() {
+iSocClient::iSocClient()
+:m_address("127.0.0.1"),
+m_port(15000)
+{
 
 }
 
-bool iSocClient::connectF(char* pAddress, int pPort)
+bool iSocClient::connectF()
 {
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
@@ -57,10 +60,10 @@ bool iSocClient::connectF(char* pAddress, int pPort)
     memset(&serv_addr, '0', sizeof(serv_addr));
   
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(pPort);
+    serv_addr.sin_port = htons(m_port);
       
     // Convert IPv4 and IPv6 addresses from text to binary form
-    if(inet_pton(AF_INET, pAddress, &serv_addr.sin_addr)<=0) 
+    if(inet_pton(AF_INET, m_address.c_str(), &serv_addr.sin_addr)<=0) 
     {
         printf("\nInvalid address/ Address not supported \n");
         return false;
@@ -92,15 +95,15 @@ int iSocClient::recv(void* pBuffer, uint16_t pSize) {
     return valread;
 }
 
-bool iSocClient::send(void* pBuffer, uint16_t pSize) {
+int iSocClient::send(void* pBuffer, uint16_t pSize) {
     int valwrite = write(sock, pBuffer, pSize);
     if(valwrite < 0){
         //std::cout << std::strerror(errno)<< "\n";
         perror("ERROR-send:");
-        return false;
+        return valwrite;
     }
-    usleep(100000);                         // waiting 100 millisec because , without that it push all logs in one buffer 
-    return true;
+   usleep(100000);                         // waiting 100 millisec because , without that it push all logs in one buffer 
+    return valwrite;
 }
 void iSocClient::closeSocket(){
     close(sock);

@@ -37,6 +37,7 @@ namespace flexd {
 
         FleXdAppArray::FleXdAppArray()
         : m_pos(m_list.begin()),
+                m_countOfCreatedApp(0),
         m_rangeOverFlow(false)
         {
             std::fill(m_list.begin(),m_list.end(),nullptr);
@@ -80,7 +81,7 @@ namespace flexd {
             return -2;
         }
         
-        int FleXdAppArray::insertToArray(std::function<void(appVec::iterator) > funcSwapingPointer) {
+        int FleXdAppArray::insertToArray(std::function<void(appVec::iterator)> funcSwapingPointer) {
             if (m_pos->get() == nullptr) {
                 funcSwapingPointer(m_pos);
                 m_countOfCreatedApp++;
@@ -125,7 +126,6 @@ namespace flexd {
                 if (ref.get()) {
                     if (ref->getAppDescriptor() == desctiptor) {
                         ref->setOffline();
-                        m_countOfCreatedApp--;
                         return true;
                     }
                 }

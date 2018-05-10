@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "iSocClient.h"
 #include "FleXdLogStream.h"
 #include "FleXdMessageType.h"
+#include "FleXdLogBuffer.h"
 #include <chrono>
 #include <iostream>
 
@@ -62,17 +63,22 @@ namespace {
 namespace flexd {
     namespace logger {
 
+
         FleXdLogger::FleXdLogger()
-        :
-        m_address("127.0.0.1"),
-                m_connectionToServer(false),
-        m_port(15000),
+        : m_connectionToServer(false),
         m_appName(""),
         m_appIDuint(0),
         m_flexLogLevel(LogLevel::Enum::VERBOSE),
         m_communicator(new iSocClient()),
-        m_msgCount(0) {
-
+        m_logBuffer(new FleXdLogBuffer(2048)),         
+        m_msgCount(0)       
+        {
+            //m_logBuffer = new FleXdLogBuffer(2048);
+            
+        }
+        
+        FleXdLogger::~FleXdLogger(){
+            //delete m_logBuffer;
         }
 
         FleXdLogger& FleXdLogger::instance() 
@@ -83,13 +89,13 @@ namespace flexd {
 
         void FleXdLogger::initLogger() 
         {
-            if(!(m_communicator->connectF((char*) m_address.c_str(), m_port))){
+            if(!(m_communicator->connectF())){
                 m_connectionToServer = false;
             } else {
                 if(handshake()){
                     m_connectionToServer = true;
                     std::cout <<  "FleXdLogger::->  Logging to ServerLogger." << std::endl; 
-                } else {                                   // Loop which cycles when the handshake is not successful
+                } else {                                   
                     m_connectionToServer = false;
                 }
             }
@@ -101,16 +107,33 @@ namespace flexd {
                 initLogger();
             }
         }
-
-        void FleXdLogger::sendLog(const LogLevel::Enum logLevel, const std::stringstream&& stream, time_t time) {
+        
+        void FleXdLogger::writeLogToBuffer(const LogLevel::Enum logLevel, const std::stringstream&& stream, time_t time) {
             if (logLevel >= m_flexLogLevel) {
-
                 LogStream logStream(m_appIDuint, time, logLevelToMsgType(logLevel), m_msgCount, std::move(stream));
-                std::vector<uint8_t> streamVector = logStream.releaseData();
-                m_communicator->send(streamVector.data(), streamVector.size());
+                m_logBuffer->push(std::move(logStream));
                 m_msgCount++;
-
+                sendLog();
             }
+        }
+        
+        bool FleXdLogger::sendLog() {
+            bool freeSocketQueue = true;
+            bool returnValue = false;
+            while(freeSocketQueue && (m_logBuffer->getSizeBuffer() > 0)){           // loop that sending logs from queue, while queue is not free or socket buffer full
+                LogStream& logStreamSend = m_logBuffer->getStream();
+                logStreamSend.reset();
+                std::vector<uint8_t> streamVector = logStreamSend.getData();
+                if(m_communicator->send(streamVector.data(), streamVector.size()) > 0){
+                    m_logBuffer->pop();
+                    returnValue = true;
+                } else {
+                    //TODO comparing errno if is socket buffer full
+                    freeSocketQueue = false;
+                    returnValue = false;
+                }
+            }
+            return returnValue;
         }
 
         std::string FleXdLogger::randomString(size_t length) const {

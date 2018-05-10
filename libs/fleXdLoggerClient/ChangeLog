@@ -23,4 +23,16 @@ All notable changes to this project will be documented in this file.
 - modification connection to server and editing some messeges
 
 ### Removed
+- None 
+
+## [0.0.1] - 2018-05-10 [Jakub Pekar]
+### Added
+- Buffering for logs
+- create ReadMe
+
+### Changed
+- dividing the log function to separate function writeLogToBuffer and sendLog
+- add buffer class to cmake
+
+### Removed
 - None  

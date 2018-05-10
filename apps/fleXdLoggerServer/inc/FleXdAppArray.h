@@ -45,11 +45,36 @@ namespace flexd {
         public:
             FleXdAppArray();
             virtual ~FleXdAppArray();
-            
-            int insertToArray(const std::string& appName, int descriptor);              
+              /**
+            * Function create and inserts the Application object into Array.
+            * @param appName - unique application identifier
+            * @param descriptor - application socket descriptor
+            * @return generated appID that identified the client in communication
+            */
+            int insertToArray(const std::string& appName, int descriptor);
+             /**
+            * Function removes the Application with assignment socket descriptor .
+            * @param descriptor - application socket descriptor
+            * @return true if remove is successful, false otherwise
+            */
             bool removeFromArray(int descriptor);
+             /**
+            * Function sets the attribute of application to the unconnected state.
+            * @param descriptor - application socket descriptor
+            * @return true if set is successful, false otherwise
+            */
             bool unconnectApplication(int desctiptor);
+             /**
+            * Function gets the name of the application.
+            * @param appID- identifier of application
+            * @return the name of application
+            */
             std::string getAppName(uint16_t appID) const;
+             /**
+            * Function finds the application in array and return pointer on it.
+            * @param appName - the name of application on that function return the pointer
+            * @return true if set is successful, false otherwise
+            */
             const std::shared_ptr<FleXdApplication> getApp(const std::string& appName)const;
         private:
             int insertToArray(std::function<void(appVec::iterator)> funcSwapingPointer);

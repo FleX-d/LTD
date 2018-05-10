@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 
+
 #define FLEX_LOG_TRACE(...)  \
     flexd::logger::FleXdLogger::instance().log(flexd::logger::LogLevel::Enum::VERBOSE, "verbose", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
 #define FLEX_LOG_DEBUG(...)  \
@@ -54,7 +55,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FLEX_LOG_INIT(...)  \
     flexd::logger::FleXdLogger::instance().setAppName(__VA_ARGS__);
 
+#define MAXBUFFERSIZE 2048
 class iSocClient;
+namespace flexd {
+    namespace logger {
+        class FleXdLogBuffer;
+        class LogStream;
+    }
+}
 
 namespace {
 
@@ -103,7 +111,7 @@ namespace flexd {
             
         public:
             FleXdLogger();
-            ~FleXdLogger() = default;
+            ~FleXdLogger();
             
             static FleXdLogger& instance();
             template<typename... T>
@@ -111,7 +119,7 @@ namespace flexd {
                 std::stringstream ss;
                 FleXdLog(ss, logs...);
                 if(m_connectionToServer){
-                    sendLog(logLevel, std::move(ss), time);
+                    writeLogToBuffer(logLevel, std::move(ss), time);
                 } else {
                     std::cout << "FleXdLogger::[" << m_appName << "][" << m_appIDuint << "][" << time <<"][" << level << "] : " << ss.str() << std::endl;
                 }
@@ -122,19 +130,21 @@ namespace flexd {
             void operator=(FleXdLogger const&) = delete;
         private:
             void initLogger();
-            void sendLog(const LogLevel::Enum logLevel, const std::stringstream&& stream, std::time_t time);
+            bool sendLog();
+            void writeLogToBuffer(const LogLevel::Enum logLevel, const std::stringstream&& stream, std::time_t time);
             bool handshake();
             
             std::string randomString( size_t length ) const;
             
         private:
-            std::string m_address;
             bool m_connectionToServer;
-            int m_port;
             std::string m_appName;
             uint16_t m_appIDuint;
             LogLevel::Enum m_flexLogLevel;
-            std::unique_ptr<iSocClient> m_communicator;
+            std::shared_ptr<iSocClient> m_communicator;
+            std::unique_ptr<FleXdLogBuffer> m_logBuffer;          //problem initialization because object has variable size 
+            //FleXdLogBuffer* m_logBuffer;
+            
             uint8_t m_msgCount;
             
             

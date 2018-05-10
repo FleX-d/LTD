@@ -18,12 +18,14 @@ SET(publicHeaders
 SET(privateHeaders
     inc/iSocClient.h
     inc/FleXdLogStream.h
+    inc/FleXdLogBuffer.h
 )
 
 SET(privateSources
     src/iSocClient.cpp
     src/FleXdLogStream.cpp
     src/FleXdLogger.cpp
+    src/FleXdLogBuffer.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${privateSources})

@@ -71,7 +71,7 @@ namespace flexd {
 
                 if (appId > 0) {
                     FleXdLogMessage ackMessage((uint16_t)appId, (uint8_t) MsgType::Enum::HANDSHAKESUCCES, 0, std::to_string(appId));
-                    std::cout << "*ACKMESSAGE* -> ";
+                    std::cout << "*ACK-"<< initmessage.getLogMessage() <<  "* -> ";
                     ackMessage.logToCout();
                     writeLog("FleXdLoggerServer",0,"VERBOSE",std::string(" -> Ack successful. *")+ m_arrayOfApp.getAppName(appId) + std::string("* has appID ") + std::to_string(appId));
                 
@@ -87,7 +87,7 @@ namespace flexd {
                     return client;
                 } else if (appId == -1) {
                     FleXdLogMessage ackMessage(appId, (uint8_t) MsgType::Enum::HANDSHAKEFAIL, 0, std::string("***This application name using other client***"));
-                    std::cout << "*ACKMESSAGE*-> ";
+                    std::cout << "*ACK-"<< initmessage.getLogMessage() <<  "* -> ";
                     ackMessage.logToCout();
                     writeLog("FleXdLoggerServer",0,"VERBOSE",std::string(" -> Handshake problem. This name is using."));
                     std::vector<uint8_t> streamVector = ackMessage.releaseData();

@@ -50,9 +50,23 @@ namespace flexd {
         public:
             explicit FleXdLoggerServer(bool logToDlt = false);
             virtual ~FleXdLoggerServer();
-            
+             /**
+            * Function is called after successful handshake and logging the receiving message to the syslog/dlt and cout.
+            * @param client - file descriptor of client for communication and sending logs
+            * @return true after successful logging, false otherwise
+            */
             bool loggingFunc(const int client);                 //logging only for one application (TODO: threads?? Or solution is IPC?)
+             /**
+            * Function set on the client side the logLevel for filtering of logs.
+            * @param appName - application identifier for which the log level should be changed
+            * @param logLevel - log level value
+            * @return true if set is successful, false otherwise
+            */
             bool setLogLevel(const std::string& appName, MsgType::Enum logLevel); 
+             /**
+            * Function await the client connection, than accept name of client and insert it to the AppArray, if its name is unique.
+            * @return file descriptor of connected client, when occurred problem return negative value
+            */
             int handshake();
             
             FleXdLoggerServer(const FleXdLoggerServer& orig) = delete;

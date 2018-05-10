@@ -40,7 +40,7 @@ namespace flexd {
 
         LogStream::LogStream(std::vector<uint8_t>&& data) : BitStream(std::move(data)) {
         }
-
+      
         LogStream::LogStream(uint16_t appID, time_t time, flexd::logger::MsgType::Enum messageType, uint8_t messageCounter, const std::string& message) {
             uint16_t messageLength = message.length();
             this->put(appID, appID_size);
@@ -62,6 +62,11 @@ namespace flexd {
             this->put(msg.begin(), msg.end());
         }
 
+        LogStream::LogStream(LogStream&& stream) : BitStream(std::move(stream))
+        {
+            
+        }
+        
         LogStream::~LogStream() {
         }
 

@@ -45,13 +45,39 @@ namespace flexd {
             FleXdLogMessage(std::vector<uint8_t>&& data);
             FleXdLogMessage(uint16_t appID, uint8_t msgType, uint8_t msgCounter, std::string logMessage);
             ~FleXdLogMessage() = default;
-
+             /**
+            * Function transforms log in BitStream to the readable form and writes it to the std::cout
+            */
             void logToCout();
+             /**
+            * Function parse the application id from bitstream and return it
+            * @return the application ID
+            */
             uint16_t getAppID();
+             /**
+            * Function parse the time of log from bitstream and return it
+            * @return the time in epoch form
+            */
             uint64_t getTime();
+             /**
+            * Function parse the message type from bitstream and return it
+            * @return type of message in defined form
+            */
             uint8_t getMsgType();
+             /**
+            * Function parse the message counter from bitstream and return it
+            * @return count of sending message
+            */
             uint8_t getMsgCounter();
+             /**
+            * Function parse the size of payload from bitstream and return it
+            * @return the payload size of message
+            */
             uint16_t getMsgSize();
+            /**
+            * Function parse the message payload from bitstream and return it
+            * @return payload
+            */
             std::string getLogMessage();
             FleXdLogMessage(const FleXdLogMessage& orig) = delete;
         private:
