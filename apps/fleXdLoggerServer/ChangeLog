@@ -103,3 +103,14 @@ All notable changes to this project will be documented in this file.
 ### Removed
 - None
 
+## [0.0.1] - 2018-05-15 [Jakub Pekar]
+### Added
+-gtest for the server application
+- created CMake for tests
+
+### Changed
+- None
+
+### Removed
+- None
+

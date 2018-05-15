@@ -25,28 +25,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* 
  * File:   main.cpp
- * Author: Branislav Podkonicky
+ * Author: Jakub Pekar
  *
- * Created on April 13, 2018, 2:02 PM
+ * Created on May 10, 2018, 11:10 AM
  */
 
 #include <cstdlib>
-#include <FleXdLogger.h>
-#include <unistd.h>
+#include <iostream>
+#include <gtest/gtest.h>
 
-using namespace std;
-
-/*
- * 
- */
 int main(int argc, char** argv) {
-
-    FLEX_LOG_INIT("TestApp2");
-    FLEX_LOG_DEBUG(" -> This is ALL log");
-    FLEX_LOG_INFO(" -> This is info log from client ");
-    FLEX_LOG_FATAL(" -> This is fatal error . That is very big problem.");
-    FLEX_LOG_ERROR(" -> This is error smaller problem. ");
-    
-    return 0;
+    testing::InitGoogleTest(&argc, argv);   
+    return RUN_ALL_TESTS(); 
 }
-

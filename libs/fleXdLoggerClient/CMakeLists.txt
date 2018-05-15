@@ -52,6 +52,7 @@ install(FILES ${CMAKE_BINARY_DIR}/libs/fleXdLoggerClient/${PROJECT_NAME}.pc
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
     
 SET(fleXdLoggerClientPublicInc "${fleXdLoggerClient_SOURCE_DIR}/inc/public" CACHE STRING "")
+SET(fleXdLoggerClientPrivateInc "${fleXdLoggerClient_SOURCE_DIR}/inc" CACHE STRING "")
 SET(fleXdLoggerClientLib "${PROJECT_NAME}" CACHE STRING "")
 message(STATUS "*Export fleXdLoggerClientPublicInc: " ${fleXdLoggerClientPublicInc})
 message(STATUS "*Export fleXdLoggerClientLib: " ${fleXdLoggerClientLib})
@@ -62,4 +63,6 @@ add_subdirectory(example)
 
 add_dependencies(${PROJECT_NAME} bitstream fleXdLoggerCommon)
 
-
+if(${ENABLE_TESTS})
+    add_subdirectory(gtest)
+endif(${ENABLE_TESTS})

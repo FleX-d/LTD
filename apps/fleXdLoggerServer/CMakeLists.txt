@@ -69,3 +69,9 @@ add_dependencies(${PROJECT_NAME}
 #    fleXdEpoll
 #    fleXdIPCBuffer
 )
+
+SET(fleXdLoggerServerInc "${fleXdLoggerServer_SOURCE_DIR}/inc" CACHE STRING "")
+
+if(${ENABLE_TESTS})
+    add_subdirectory(gtest)
+endif(${ENABLE_TESTS})

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2018, Globallogic s.r.o.
+Copyright (c) 2017, Globallogic s.r.o.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -23,30 +23,28 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* 
- * File:   main.cpp
- * Author: Branislav Podkonicky
- *
- * Created on April 13, 2018, 2:02 PM
- */
-
-#include <cstdlib>
-#include <FleXdLogger.h>
-#include <unistd.h>
-
-using namespace std;
-
 /*
- * 
+ * File:   FleXdLogMessageTest.cpp
+ *
+ * Author: Jakub Pekar
+ *
+ * Created on May 15, 2018, 09:22 AM
  */
-int main(int argc, char** argv) {
 
-    FLEX_LOG_INIT("TestApp2");
-    FLEX_LOG_DEBUG(" -> This is ALL log");
-    FLEX_LOG_INFO(" -> This is info log from client ");
-    FLEX_LOG_FATAL(" -> This is fatal error . That is very big problem.");
-    FLEX_LOG_ERROR(" -> This is error smaller problem. ");
+#include <gtest/gtest.h>
+#include "FleXdLogMessage.h"
+#include "BitStream.h"
+namespace {
+    std::string log("This is LOG from application");
+    /*                                  appID,msgType,msgCounter,logMessage  */
+    flexd::logger::FleXdLogMessage logmessage(10,4,11,log); 
     
-    return 0;
+    TEST(LogMessage, getFunctions) {
+        EXPECT_EQ(10,logmessage.getAppID());
+        EXPECT_NE(0,logmessage.getTime());
+        EXPECT_EQ(4,logmessage.getMsgType());
+        EXPECT_EQ(11,logmessage.getMsgCounter());
+        EXPECT_EQ(log.size(),logmessage.getMsgSize());
+        EXPECT_EQ(log,logmessage.getLogMessage());
+    }
 }
-

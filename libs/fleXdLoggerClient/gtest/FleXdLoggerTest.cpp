@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2018, Globallogic s.r.o.
+Copyright (c) 2017, Globallogic s.r.o.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -23,30 +23,16 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* 
- * File:   main.cpp
- * Author: Branislav Podkonicky
- *
- * Created on April 13, 2018, 2:02 PM
- */
-
-#include <cstdlib>
-#include <FleXdLogger.h>
-#include <unistd.h>
-
-using namespace std;
-
 /*
- * 
+ * File:   FleXdLoggerTest.cpp
+ *
+ * Author: Jakub Pekar
+ *
+ * Created on May 15, 2018, 15:12 AM
  */
-int main(int argc, char** argv) {
 
-    FLEX_LOG_INIT("TestApp2");
-    FLEX_LOG_DEBUG(" -> This is ALL log");
-    FLEX_LOG_INFO(" -> This is info log from client ");
-    FLEX_LOG_FATAL(" -> This is fatal error . That is very big problem.");
-    FLEX_LOG_ERROR(" -> This is error smaller problem. ");
-    
-    return 0;
+#include <gtest/gtest.h>
+#include "FleXdLogger.h"
+
+namespace{
 }
-

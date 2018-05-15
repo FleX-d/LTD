@@ -36,13 +36,12 @@ namespace flexd {
     namespace logger {
 
         FleXdLoggerServer::FleXdLoggerServer(bool logToDlt /*= false*/)
-        : m_socServer(new iSocServer()),
-          m_fleXdLoggerDlt(nullptr) {
+        : m_arrayOfApp(), 
+        m_socServer(new iSocServer()),
+        m_fleXdLoggerDlt(nullptr) {
             int port = 15000;
             m_socServer->connectFunck(port);
             m_socServer->listenServer();
-           
-            
             openlog("FLEXLOGGER", LOG_CONS, LOG_LOCAL0);
             writeLog("FleXdLoggerServer",0,"INFO"," -> Init");
             
@@ -108,7 +107,6 @@ namespace flexd {
             int valread;
             std::string appName;
             char buffer[1024];
-
             while (true) 
             {
                 valread = m_socServer->receive(client, buffer, 1024);

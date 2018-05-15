@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2018, Globallogic s.r.o.
+Copyright (c) 2017, Globallogic s.r.o.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -23,30 +23,43 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* 
- * File:   main.cpp
- * Author: Branislav Podkonicky
- *
- * Created on April 13, 2018, 2:02 PM
- */
-
-#include <cstdlib>
-#include <FleXdLogger.h>
-#include <unistd.h>
-
-using namespace std;
-
 /*
- * 
+ * File:   FleXdLogStreamTest.cpp
+ *
+ * Author: Jakub Pekar
+ *
+ * Created on May 15, 2018, 14:12 AM
  */
-int main(int argc, char** argv) {
 
-    FLEX_LOG_INIT("TestApp2");
-    FLEX_LOG_DEBUG(" -> This is ALL log");
-    FLEX_LOG_INFO(" -> This is info log from client ");
-    FLEX_LOG_FATAL(" -> This is fatal error . That is very big problem.");
-    FLEX_LOG_ERROR(" -> This is error smaller problem. ");
+#include <gtest/gtest.h>
+#include "FleXdLogStream.h"
+
+    std::string testLog("This is log message");
+    flexd::logger::LogStream stream(32,15151515000,flexd::logger::MsgType::Enum::ERROR, 128, testLog);
     
-    return 0;
+namespace{
+    TEST(LogStream, testGetAppID){
+        EXPECT_EQ(stream.getAppID(), 32);
+    }
+    
+    TEST(LogStream, testGetTime){
+        EXPECT_EQ(stream.getTime(), 15151515000);
+    }
+    
+    TEST(LogStream, testGetMessageType){
+        EXPECT_EQ(stream.getMessageType(), flexd::logger::MsgType::Enum::ERROR);
+    }
+    
+    TEST(LogStream, testGetMessageCounter){
+        EXPECT_EQ(stream.getMessageCounter(), 128);
+    }
+    
+    TEST(LogStream, testGetMessageLength){
+        EXPECT_EQ(stream.getMessageLength(), testLog.size());
+    }
+    
+    TEST(LogStream, testGetMessage){
+        EXPECT_EQ(stream.getMessage(), testLog);
+    }
+    
 }
-

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2018, Globallogic s.r.o.
+Copyright (c) 2017, Globallogic s.r.o.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -23,30 +23,41 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* 
- * File:   main.cpp
- * Author: Branislav Podkonicky
- *
- * Created on April 13, 2018, 2:02 PM
- */
-
-#include <cstdlib>
-#include <FleXdLogger.h>
-#include <unistd.h>
-
-using namespace std;
-
 /*
- * 
+ * File:   FleXdApplicationTest.cpp
+ *
+ * Author: Jakub Pekar
+ *
+ * Created on May 15, 2018, 09:02 AM
  */
-int main(int argc, char** argv) {
 
-    FLEX_LOG_INIT("TestApp2");
-    FLEX_LOG_DEBUG(" -> This is ALL log");
-    FLEX_LOG_INFO(" -> This is info log from client ");
-    FLEX_LOG_FATAL(" -> This is fatal error . That is very big problem.");
-    FLEX_LOG_ERROR(" -> This is error smaller problem. ");
-    
-    return 0;
+#include <gtest/gtest.h>
+#include "FleXdApplication.h"
+
+flexd::logger::FleXdApplication application("TestApp",6);
+
+TEST(Application,setState){
+    EXPECT_TRUE(application.isOnline());
+    application.setOffline();
+    EXPECT_FALSE(application.isOnline());
+    application.setOnline();
+    EXPECT_TRUE(application.isOnline());    
 }
 
+TEST(Application,ApplicationDescriptor){
+    EXPECT_EQ(6,application.getAppDescriptor());
+    application.setAppDescriptor(10);
+    EXPECT_NE(6,application.getAppDescriptor());
+    EXPECT_EQ(10,application.getAppDescriptor());  
+}
+
+TEST(Application,LogLevel){
+    EXPECT_EQ(flexd::logger::MsgType::Enum::VERBOSE,application.getLogLevel());
+    application.setLogLevel(flexd::logger::MsgType::Enum::FATAL);
+    EXPECT_NE(flexd::logger::MsgType::Enum::VERBOSE,application.getLogLevel());
+    EXPECT_EQ(flexd::logger::MsgType::Enum::FATAL,application.getLogLevel());
+}
+
+TEST(Application, CompareName){
+    EXPECT_TRUE(application.compareName("TestApp"));
+}

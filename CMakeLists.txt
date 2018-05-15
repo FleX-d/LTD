@@ -16,7 +16,7 @@ set_property(
 option(
     ENABLE_TESTS
     "Build tests?"
-    OFF
+    ON
 )
 message(STATUS "option ENABLE_TESTS=" ${ENABLE_TESTS})
 

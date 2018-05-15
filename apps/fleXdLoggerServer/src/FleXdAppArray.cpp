@@ -37,7 +37,7 @@ namespace flexd {
 
         FleXdAppArray::FleXdAppArray()
         : m_pos(m_list.begin()),
-                m_countOfCreatedApp(0),
+        m_countOfCreatedApp(0),
         m_rangeOverFlow(false)
         {
             std::fill(m_list.begin(),m_list.end(),nullptr);
@@ -51,7 +51,8 @@ namespace flexd {
             for (auto ref = m_list.begin(); ref < m_list.end(); ref++) {
                 if (ref->get()) {
                     if(++countOfControledPtr > m_countOfCreatedApp){          // If loop checked all pointers in list,break loop. 
-                        break;
+                        return -3;
+                        
                     }
                     if (ref->get()->compareName(appName)) {
                         if(!ref->get()->isOnline()){
@@ -112,10 +113,11 @@ namespace flexd {
         
         const std::shared_ptr<FleXdApplication> FleXdAppArray::getApp(const std::string& appName) const {
             for (auto app : m_list) 
-            {
-                if(app->compareName(appName))
-                {
-                    return app;
+            {   if (app) {
+                    if(app->compareName(appName))
+                    {
+                        return app;
+                    }
                 }
             }
             return nullptr;
