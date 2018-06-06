@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
  * File:   FleXdAppArrayTest.cpp
- *
+ * 
  * Author: Jakub Pekar
  *
  * Created on May 10, 2018, 12:02 AM
@@ -61,10 +61,8 @@ namespace {
     }
     
     TEST(Array,AppReferenceReturn){
-       // pApp = array.getApp("Second");
-        
         EXPECT_EQ(pApp->getAppDescriptor(),application.getAppDescriptor());
-        //EXPECT_EQ(pApp->getLogLevel(),application.getLogLevel());
+        EXPECT_EQ(pApp->getLogLevel(),application.getLogLevel());
     }
     
     TEST(Array,UnconnectApplication){
@@ -76,7 +74,7 @@ namespace {
         EXPECT_FALSE(array.removeFromArray(10));
         EXPECT_TRUE(array.removeFromArray(6));
     }
-    /** Complex tests of functionality **/
+    /** More complex tests of functionality **/
     
     TEST(Array,TestOfOverFlowing){
         std::string appName;

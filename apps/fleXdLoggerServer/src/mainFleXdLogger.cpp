@@ -23,7 +23,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* 
+/*
  * File:   mainFleXdLogger.cpp
  * Author: Jakub Pekar
  */
@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <signal.h>
 #include <memory>
 #include "FleXdLoggerServer.h"
+#include "FleXdEpoll.h"
 
 #define CMD_LOG_TO_DLT "-dlt"
 
@@ -42,7 +43,6 @@ void signalHandler(int s)
 }
 
 int main(int argc, char** argv) {
-    int clientDesc;
     std::unique_ptr<flexd::logger::FleXdLoggerServer> loggerServer;
     bool logTodlt = false;
     bool argError = false;
@@ -72,15 +72,10 @@ int main(int argc, char** argv) {
     }
 
     // Create server
-    loggerServer = std::make_unique<flexd::logger::FleXdLoggerServer>(logTodlt);
+    flexd::icl::ipc::FleXdEpoll poller(10); //TODO max number of events
+    loggerServer = std::make_unique<flexd::logger::FleXdLoggerServer>(poller, logTodlt);
+    poller.loop();
 
-    while(true){
-        clientDesc = loggerServer->handshake();
-        if(clientDesc > 0){
-            loggerServer->loggingFunc(clientDesc);
-    
-        }
-    }
     return 0;
 }
 

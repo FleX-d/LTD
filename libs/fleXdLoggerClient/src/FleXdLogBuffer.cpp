@@ -23,64 +23,57 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* 
+/*
  * File:   FleXdLogBuffer.cpp
  * Author: Jakub Pekar
- * 
+ *
  * Created on May 3, 2018, 1:25 PM
  */
 
 #include "FleXdLogBuffer.h"
-#include "iSocClient.h"
 
 namespace flexd {
     namespace logger {
 
         FleXdLogBuffer::FleXdLogBuffer(size_t maxSizeBuffer)
         : m_maxSizeBuffer(maxSizeBuffer),
-        m_sizeBuffer(0),      
-        m_queue(),
-        m_mutex()        
-        {      
+          m_sizeBuffer(0),
+          m_queue(),
+          m_mutex() {
         }
-        
+
         uint32_t FleXdLogBuffer::getSizeBuffer() {
             return m_sizeBuffer;
         }
 
-
-        LogStream& FleXdLogBuffer::getStream() {
-            if (m_sizeBuffer > 0){
-               return m_queue.front();
+        const LogData* FleXdLogBuffer::getData() const {
+            if (m_sizeBuffer > 0) {
+               return &m_queue.front();
             }
+            return nullptr;
         }
-        
+
         bool FleXdLogBuffer::pop() {
             std::lock_guard<std::mutex> bufferLock(m_mutex);
-            if (m_sizeBuffer > 0){
-                m_sizeBuffer -= m_queue.front().getMessageLength();
+            if (m_sizeBuffer > 0) {
+                m_sizeBuffer -= m_queue.front().message.size();
                 m_queue.pop();
                 return true;
             }
             return false;
         }
 
-        
-        bool FleXdLogBuffer::push(LogStream&& logStream) {
+        bool FleXdLogBuffer::push(LogData&& logData) {
             std::lock_guard<std::mutex> bufferLock(m_mutex);
-            m_sizeBuffer += logStream.getMessageLength();// TODO getMessageLength return only size of payload without the header
+            m_sizeBuffer += logData.message.size();// TODO getMessageLength return only size of payload without the header
             if (m_sizeBuffer < m_maxSizeBuffer){
-                m_queue.push(std::move(logStream));
-                
+                m_queue.push(std::move(logData));
                 return true;
-            }else {
-                m_sizeBuffer -= logStream.getMessageLength();
+            } else {
+                m_sizeBuffer -= logData.message.size();
             }
             return false;
         }
-
-
-
 
     } // namespace FlexLogger
 } // namespace flexd

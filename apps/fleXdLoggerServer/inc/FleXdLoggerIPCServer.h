@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017, Globallogic s.r.o.
+Copyright (c) 2018, Globallogic s.r.o.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -23,42 +23,49 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* 
- * File:   iSocClient.h
+/*
+ * File:   FleXdLoggerIPC.h
  * Author: Jakub Pekar
  */
 
+#ifndef FLEXDLOGGERIPC_H
+#define FLEXDLOGGERIPC_H
 
-#ifndef ISOCCLIENT_H
-#define ISOCCLIENT_H
+#include "FleXdIPCProxyBuilder.h"
+#include "FleXdEpoll.h"
+#include "FleXdUDSServer.h"
+#include "FleXdLogStream.h"
+#include "FleXdAppArray.h"
 
-#include <stdint.h>
-#include <stdio.h>
-#include <sys/socket.h>
-#include <stdlib.h>
-#include <netinet/in.h>
-#include <iostream>
-#include <arpa/inet.h>
+namespace flexd {
+    namespace logger {
 
-class iSocClient {
-    
-public:
-    iSocClient();
-    iSocClient(const iSocClient& orig) = default;
-    bool connectF();
-    int send(void *pBuffer, uint16_t pSize);
-    int recv(int pDescriptor, void* pBuffer, uint16_t pSize);
-    int recv(void* pBuffer, uint16_t pSize);
-    void closeSocket();
-    ~iSocClient();
-    
-private:
-    std::string m_address;
-    int m_port;
-    sockaddr_in serv_addr;
-    sockaddr_in address;
-    int sock;
-};
+        class FleXdLoggerIPC : public flexd::icl::ipc::FleXdIPCProxyBuilder<flexd::icl::ipc::FleXdUDSServer>
+        {
+        public:
+            FleXdLoggerIPC(std::shared_ptr<FleXdAppArray> appArray, flexd::icl::ipc::FleXdEpoll& poller, std::function<bool(FleXdLogStream&)> logging);
+            virtual ~FleXdLoggerIPC() = default;
 
-#endif /* ISOCCLIENT_H */
+            virtual void rcvMsg(flexd::icl::ipc::pSharedFleXdIPCMsg msg, int fd) override;
+            void onConnectClient(int fd);
+            void onDisconnectClient(int fd);
+
+            FleXdLoggerIPC(const FleXdLoggerIPC& orig) = delete;
+            FleXdLoggerIPC& operator=(const FleXdLoggerIPC&) = delete;
+
+        private:
+            bool handshake(FleXdLogStream& hsMsg, int fd);
+
+        private:
+            std::shared_ptr<FleXdAppArray> m_appArray;
+            std::function<bool(FleXdLogStream&)> m_logging;
+            std::vector<int> m_undefineFD;
+
+        };
+
+    } // namespace logger
+} // namespace flexd
+
+
+#endif /* FLEXDCONNECTOR_H */
 

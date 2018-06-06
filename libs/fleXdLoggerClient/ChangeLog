@@ -46,3 +46,12 @@ All notable changes to this project will be documented in this file.
 - None  
 ### Removed
 - None  
+
+## [0.0.1] - 2018-06-06 [Jakub Pekar]
+### Added
+- implementation of ICL
+### Changed
+- relocated the LogStream to the common project for client and server -> removing of duplicates
+### Removed
+- Socket which is replaced by ICL 
+- LogStream

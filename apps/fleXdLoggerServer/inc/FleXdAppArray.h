@@ -23,7 +23,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* 
+/*
  * File:   FleXdAppArray.h
  * Author: Jakub Pekar
  */
@@ -44,7 +44,7 @@ namespace flexd {
             typedef std::array<std::shared_ptr<FleXdApplication>, UINT16_MAX> appVec;
         public:
             FleXdAppArray();
-            virtual ~FleXdAppArray();
+            virtual ~FleXdAppArray() = default;
               /**
             * Function create and inserts the Application object into Array.
             * @param appName - unique application identifier
@@ -63,7 +63,7 @@ namespace flexd {
             * @param descriptor - application socket descriptor
             * @return true if set is successful, false otherwise
             */
-            bool unconnectApplication(int desctiptor);
+            bool disconnectApplication(int desctiptor);
              /**
             * Function gets the name of the application.
             * @param appID- identifier of application

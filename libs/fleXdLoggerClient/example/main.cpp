@@ -23,7 +23,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* 
+/*
  * File:   main.cpp
  * Author: Branislav Podkonicky
  *
@@ -32,21 +32,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstdlib>
 #include <FleXdLogger.h>
+#include <FleXdEpoll.h>
 #include <unistd.h>
 
 using namespace std;
 
 /*
- * 
+ *
  */
 int main(int argc, char** argv) {
 
-    FLEX_LOG_INIT("TestApp2");
-    FLEX_LOG_DEBUG(" -> This is ALL log");
-    FLEX_LOG_INFO(" -> This is info log from client ");
-    FLEX_LOG_FATAL(" -> This is fatal error . That is very big problem.");
-    FLEX_LOG_ERROR(" -> This is error smaller problem. ");
-    
+    flexd::icl::ipc::FleXdEpoll poller(10);
+    std::string appname = "TestApp";
+    if (argc > 1){
+        appname = std::string(argv[1]);
+    }
+    bool init = FLEX_LOG_INIT(poller, appname)
+
+    FLEX_LOG_DEBUG(" -> This is debug log.");
+    FLEX_LOG_INFO(" -> This is info log.");
+    FLEX_LOG_FATAL(" -> This is fatal error log. Thia is very big problem.");
+    FLEX_LOG_ERROR(" -> This is error log. This is smaller problem.");
+
+    if (init)
+    {
+        poller.loop();
+    }
     return 0;
 }
 

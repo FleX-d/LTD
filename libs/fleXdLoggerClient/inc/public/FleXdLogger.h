@@ -23,22 +23,19 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* 
+/*
  * File:   FleXdLogger.h
- * Author: Jakub Pekar 
+ * Author: Jakub Pekar
  * Author: Branislav Podkonicky
  */
 
 #ifndef FLEXDLOGGER_H
 #define FLEXDLOGGER_H
 
-
 #include <algorithm>
 #include <thread>
 #include <sstream>
 #include <iostream>
-
-
 
 #define FLEX_LOG_TRACE(...)  \
     flexd::logger::FleXdLogger::instance().log(flexd::logger::LogLevel::Enum::VERBOSE, "verbose", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
@@ -52,17 +49,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     flexd::logger::FleXdLogger::instance().log(flexd::logger::LogLevel::Enum::ERROR, "error", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
 #define FLEX_LOG_FATAL(...)  \
     flexd::logger::FleXdLogger::instance().log(flexd::logger::LogLevel::Enum::FATAL, "fatal", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
-#define FLEX_LOG_INIT(...)  \
-    flexd::logger::FleXdLogger::instance().setAppName(__VA_ARGS__);
+#define FLEX_LOG_INIT( ...)  \
+    flexd::logger::FleXdLogger::instance().loggerInit(__VA_ARGS__);
+#define FLEX_START_LOOP(...) \
+    flexd::logger::FleXdLogger::instance().runLoop(__VA_ARGS__);
 
-#define MAXBUFFERSIZE 2048
-class iSocClient;
+#define FLEXDLOGGER_MAXLOGBUFFERSIZE 2048
+
 namespace flexd {
-    namespace logger {
-        class FleXdLogBuffer;
-        class LogStream;
+    namespace icl {
+        namespace ipc {
+            class FleXdEpoll;
+        }
     }
 }
+
+namespace flexd {
+    namespace logger {
+
+        class FleXdLogBuffer;
+        class FleXdLoggerIPCClient;
+
+    } //namespace logger
+} //namespace flexd
 
 namespace {
 
@@ -94,7 +103,7 @@ namespace {
 
 namespace flexd {
     namespace logger {
-        
+
         namespace LogLevel {
             enum Enum {
                 VERBOSE = 0x00,
@@ -106,52 +115,42 @@ namespace flexd {
                 // TODO other types of message
             };
         }
-        
+
         class FleXdLogger {
-            
+
         public:
-            FleXdLogger();
             ~FleXdLogger();
-            
             static FleXdLogger& instance();
             template<typename... T>
-            void log(LogLevel::Enum logLevel, std::string level, std::thread::id threadId, std::time_t time, T... logs) {
+            void log(LogLevel::Enum logLevel, const std::string& level, std::thread::id threadId, std::time_t time, T... logs)
+            {
                 std::stringstream ss;
                 FleXdLog(ss, logs...);
-                if(m_connectionToServer){
-                    writeLogToBuffer(logLevel, std::move(ss), time);
-                } else {
-                    std::cout << "FleXdLogger::[" << m_appName << "][" << m_appIDuint << "][" << time <<"][" << level << "] : " << ss.str() << std::endl;
-                }
+                writeLog(logLevel, time, level, ss.str());
             }
-            
-            void setAppName(const std::string appID);
+            bool loggerInit(flexd::icl::ipc::FleXdEpoll& poller, const std::string& appID);
             FleXdLogger(FleXdLogger const&) = delete;
             void operator=(FleXdLogger const&) = delete;
+
         private:
+            FleXdLogger();
             void initLogger();
-            bool sendLog();
-            void writeLogToBuffer(const LogLevel::Enum logLevel, const std::stringstream&& stream, std::time_t time);
-            bool handshake();
-            
-            std::string randomString( size_t length ) const;
-            
+            void writeLog(LogLevel::Enum logLevel, std::time_t time, const std::string& level, const std::string& stream);
+            void writeLogToBuffer(const LogLevel::Enum logLevel, const std::string& stream, std::time_t time);
+            void handshake();
+
         private:
             bool m_connectionToServer;
             std::string m_appName;
             uint16_t m_appIDuint;
             LogLevel::Enum m_flexLogLevel;
-            std::shared_ptr<iSocClient> m_communicator;
-            std::unique_ptr<FleXdLogBuffer> m_logBuffer;          //problem initialization because object has variable size 
-            //FleXdLogBuffer* m_logBuffer;
-            
+            std::shared_ptr<FleXdLogBuffer> m_logBuffer;
+            std::unique_ptr<FleXdLoggerIPCClient> m_IPCClient;
+
             uint8_t m_msgCount;
-            
-            
         };
 
     } // namespace logger
 } // namespace flexd
 
 #endif /* FLEXDLOGGER_H */
-

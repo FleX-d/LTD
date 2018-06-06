@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   FleXdLogBuffer.h
  * Author: dev
  *
@@ -19,27 +19,33 @@
 #include <mutex>
 
 #include "FleXdLogStream.h"
-#include "iSocClient.h"
 
 namespace flexd {
     namespace logger {
+        struct LogData {
+            time_t time;
+            flexd::logger::MsgType::Enum messageType;
+            uint8_t messageCounter;
+            std::string message;
+        };
 
         class FleXdLogBuffer {
+
         public:
             FleXdLogBuffer(size_t maxSizeBuffer);
             FleXdLogBuffer(const FleXdLogBuffer& orig) = delete;
             virtual ~FleXdLogBuffer() = default;
              /**
-            * Function inserts the logStream on the back queue. 
+            * Function inserts the logStream on the back queue.
             * @param logStream - inserted log
             * @return true after successful inserting
             */
-            bool push(LogStream&& logStream);
+            bool push(LogData&& logData);
              /**
             * Function gets the first logStream from queue, but not remove it.
-            * @return reference to the first element in queue
+            * @return pointer to the first element in queue
             */
-            LogStream& getStream();
+            const LogData* getData() const;
              /**
             * Function removes an element from the front of the queue.
             * @return true if removing is successful, false otherwise
@@ -50,11 +56,11 @@ namespace flexd {
             * @return size of buffer
             */
             uint32_t getSizeBuffer();
-        private:
+
         private:
             size_t m_maxSizeBuffer;
             size_t m_sizeBuffer;
-            std::queue<LogStream> m_queue;
+            std::queue<LogData> m_queue;
             std::mutex m_mutex;
         };
 

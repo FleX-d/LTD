@@ -11,52 +11,59 @@ message(STATUS "fleXdLoggerDltPublicInc: " ${fleXdLoggerDltPublicInc})
 message(STATUS "fleXdLoggerDltLib: " ${fleXdLoggerDltLib})
 message(STATUS "BITSTREAM_INCLUDE_DIR:" ${BITSTREAM_INCLUDE_DIR})
 
-#find_package(PkgConfig)
-#pkg_check_modules(FLEXDUDS REQUIRED fleXdUDS)
-#pkg_check_modules(FLEXDEPOLL REQUIRED fleXdEpoll)
-#pkg_check_modules(FLEXDIPCBUFFER REQUIRED fleXdIPCBuffer)
+find_package(PkgConfig)
+pkg_check_modules(FLEXDUDS REQUIRED fleXdUDS)
+pkg_check_modules(FLEXDEPOLL REQUIRED fleXdEpoll)
+pkg_check_modules(FLEXDIPCCOMMON REQUIRED fleXdIPCCommon)
 
+message(STATUS "FLEXDUDS_INCLUDE_DIRS: "  ${FLEXDUDS_INCLUDE_DIRS})
+message(STATUS "FLEXDUDS_LIBRARY_DIRS: "  ${FLEXDUDS_LIBRARIES})
+message(STATUS "FLEXDEPOLL_INCLUDE_DIRS: "  ${FLEXDEPOLL_INCLUDE_DIRS})
+message(STATUS "FLEXDEPOLL_LIBRARIES: "  ${FLEXDEPOLL_LIBRARIES})
+message(STATUS "BITSTREAM_INCLUDE_DIR:" ${BITSTREAM_INCLUDE_DIR})
 SET(publicHeaders
 )
 
 SET(privateHeaders
     inc/FleXdAppArray.h
     inc/FleXdApplication.h
-    inc/iSocServer.h
     inc/FleXdLoggerServer.h
-    inc/FleXdLogMessage.h
-    inc/FleXdLoggerIPC.h
+    inc/FleXdLoggerIPCServer.h
 )
 
 SET(privateSources
-  src/FleXdAppArray.cpp
-  src/FleXdApplication.cpp
-  src/iSocServer.cpp
-  src/FleXdLoggerServer.cpp
-  src/FleXdLogMessage.cpp
-  src/mainFleXdLogger.cpp
-  src/FleXdLoggerIPC.cpp
+    src/FleXdAppArray.cpp
+    src/FleXdApplication.cpp
+    src/FleXdLoggerServer.cpp
+    src/mainFleXdLogger.cpp
+    src/FleXdLoggerIPCServer.cpp
 )
 
 add_executable(${PROJECT_NAME} ${privateSources} ${privateHeaders} ${publicHeaders})
 target_include_directories(${PROJECT_NAME} PUBLIC inc/public)
-target_include_directories(${PROJECT_NAME} PRIVATE inc/ 
-    ${BITSTREAM_INCLUDE_DIR} 
+target_include_directories(${PROJECT_NAME} PRIVATE inc/
+    ${BITSTREAM_INCLUDE_DIR}
     ${fleXdLoggerCommonPublicInc}
-    ${fleXdLoggerDltPublicInc}
-#    ${FLEXDUDS_INCLUDE_DIRS}
-#    ${FLEXDEPOLL_INCLUDE_DIRS}
-#    ${FLEXDIPCBUFFER_INCLUDE_DIRS}
+    ${FLEXDUDS_INCLUDE_DIRS}
+    ${FLEXDEPOLL_INCLUDE_DIRS}
+    ${FLEXDIPCCOMMON_INCLUDE_DIRS}
 )
+
+if(${LOG_TO_DLT})
+    target_include_directories(${PROJECT_NAME} PRIVATE ${fleXdLoggerDltPublicInc})
+endif(${LOG_TO_DLT})
 
 target_compile_options(${PROJECT_NAME} PUBLIC -std=c++14 -Wall -Wfloat-conversion)
 target_link_libraries(${PROJECT_NAME}
-    ${fleXdLoggerDltLib}
-#    ${FLEXDUDS_LIBRARIES}
-#    ${FLEXDEPOLL_LIBRARIES}
-#    ${FLEXDIPCBUFFER_LIBRARIES}
-)
-
+        ${FLEXDUDS_LIBRARIES}
+        ${FLEXDEPOLL_LIBRARIES}
+        ${FLEXDIPCCOMMON_LIBRARIES}
+    )
+if(${LOG_TO_DLT})
+    target_link_libraries(${PROJECT_NAME}
+        ${fleXdLoggerDltLib}
+    )
+endif(${LOG_TO_DLT})
 
 install(TARGETS ${PROJECT_NAME}
     DESTINATION ${CMAKE_BINARY_DIR})
@@ -64,11 +71,10 @@ install(TARGETS ${PROJECT_NAME}
 add_dependencies(${PROJECT_NAME}
     bitstream
     fleXdLoggerCommon
-    fleXdLoggerDlt
-#    fleXdUDS
-#    fleXdEpoll
-#    fleXdIPCBuffer
 )
+if(${LOG_TO_DLT})
+    add_dependencies(${PROJECT_NAME} fleXdLoggerDlt)
+endif(${LOG_TO_DLT})
 
 SET(fleXdLoggerServerInc "${fleXdLoggerServer_SOURCE_DIR}/inc" CACHE STRING "")
 

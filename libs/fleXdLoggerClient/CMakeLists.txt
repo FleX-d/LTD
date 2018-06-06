@@ -11,21 +11,24 @@ message(STATUS "BITSTREAM_INCLUDE_DIR:" ${BITSTREAM_INCLUDE_DIR})
 
 include(GNUInstallDirs)
 
+find_package(PkgConfig)
+pkg_check_modules(FLEXDUDS REQUIRED fleXdUDS)
+pkg_check_modules(FLEXDEPOLL REQUIRED fleXdEpoll)
+pkg_check_modules(FLEXDIPCCOMMON REQUIRED fleXdIPCCommon)
+
 SET(publicHeaders
     inc/public/FleXdLogger.h
 )
 
 SET(privateHeaders
-    inc/iSocClient.h
-    inc/FleXdLogStream.h
     inc/FleXdLogBuffer.h
+    inc/FleXdLoggerIPCClient.h
 )
 
 SET(privateSources
-    src/iSocClient.cpp
-    src/FleXdLogStream.cpp
     src/FleXdLogger.cpp
     src/FleXdLogBuffer.cpp
+    src/FleXdLoggerIPCClient.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${privateSources})
@@ -36,13 +39,19 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 configure_file(${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc @ONLY)
 
 target_include_directories(${PROJECT_NAME} PUBLIC inc/public )
-target_include_directories(${PROJECT_NAME} PRIVATE inc/ 
+target_include_directories(${PROJECT_NAME} PRIVATE inc/
     ${BITSTREAM_INCLUDE_DIR}
     ${fleXdLoggerCommonPublicInc}
+    ${FLEXDUDS_INCLUDE_DIRS}
+    ${FLEXDEPOLL_INCLUDE_DIRS}
+    ${FLEXDIPCCOMMON_INCLUDE_DIRS}
 )
 target_compile_options(${PROJECT_NAME} PUBLIC -std=c++14 -Wall -Wfloat-conversion)
 
 target_link_libraries(${PROJECT_NAME}
+    ${FLEXDUDS_LIBRARIES}
+    ${FLEXDEPOLL_LIBRARIES}
+    ${FLEXDIPCCOMMON_LIBRARIES}
 )
 
 install(TARGETS ${PROJECT_NAME}
@@ -50,7 +59,7 @@ install(TARGETS ${PROJECT_NAME}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(FILES ${CMAKE_BINARY_DIR}/libs/fleXdLoggerClient/${PROJECT_NAME}.pc
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
-    
+
 SET(fleXdLoggerClientPublicInc "${fleXdLoggerClient_SOURCE_DIR}/inc/public" CACHE STRING "")
 SET(fleXdLoggerClientPrivateInc "${fleXdLoggerClient_SOURCE_DIR}/inc" CACHE STRING "")
 SET(fleXdLoggerClientLib "${PROJECT_NAME}" CACHE STRING "")
@@ -61,7 +70,10 @@ message(STATUS "*Export fleXdLoggerClientLib: " ${fleXdLoggerClientLib})
 #TODO avoid build examples by defualt
 add_subdirectory(example)
 
-add_dependencies(${PROJECT_NAME} bitstream fleXdLoggerCommon)
+add_dependencies(${PROJECT_NAME}
+    bitstream
+    fleXdLoggerCommon
+    )
 
 if(${ENABLE_TESTS})
     add_subdirectory(gtest)

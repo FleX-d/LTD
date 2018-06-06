@@ -40,6 +40,7 @@ namespace flexd {
           m_online(true),
           m_logLevel(MsgType::Enum::VERBOSE){
         }
+        
         void FleXdApplication::setOnline() {
             m_online = true;
         }
@@ -53,7 +54,6 @@ namespace flexd {
         void FleXdApplication::setLogLevel(MsgType::Enum logLevel) {
             m_logLevel = logLevel;
         }
-
 
         MsgType::Enum FleXdApplication::getLogLevel(){
             return m_logLevel;
@@ -83,7 +83,6 @@ namespace flexd {
             this->m_appFileDesc =orig.m_appFileDesc;
             this->m_appName = orig.m_appName;
         }
-
 
         FleXdApplication::~FleXdApplication() {
         }

@@ -23,7 +23,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* 
+/*
  * File:   FleXdLoggerServer.h
  * Author: Jakub Pekar
  */
@@ -32,12 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FLEXLOGGERSERVER_H
 
 
-#include "iSocServer.h"
-#include "FleXdLogMessage.h"
+#include "FleXdLogStream.h"
 #include "FleXdMessageType.h"
 #include "FleXdAppArray.h"
-#include "FleXdLoggerIPC.h"
+#include "FleXdLoggerIPCServer.h"
 #include "FleXdLoggerDlt.h"
+#include "FleXdEpoll.h"
 #include <sstream>
 #include <thread>
 #include <syslog.h>
@@ -45,44 +45,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace flexd {
     namespace logger {
-        
+
         class FleXdLoggerServer {
         public:
-            explicit FleXdLoggerServer(bool logToDlt = false);
+            explicit FleXdLoggerServer(flexd::icl::ipc::FleXdEpoll& poller, bool logToDlt = false);
             virtual ~FleXdLoggerServer();
-             /**
-            * Function is called after successful handshake and logging the receiving message to the syslog/dlt and cout.
-            * @param client - file descriptor of client for communication and sending logs
-            * @return true after successful logging, false otherwise
-            */
-            bool loggingFunc(const int client);                 //logging only for one application (TODO: threads?? Or solution is IPC?)
              /**
             * Function set on the client side the logLevel for filtering of logs.
             * @param appName - application identifier for which the log level should be changed
             * @param logLevel - log level value
             * @return true if set is successful, false otherwise
             */
-            bool setLogLevel(const std::string& appName, MsgType::Enum logLevel); 
+            bool setLogLevel(const std::string& appName, MsgType::Enum logLevel);
              /**
             * Function await the client connection, than accept name of client and insert it to the AppArray, if its name is unique.
             * @return file descriptor of connected client, when occurred problem return negative value
             */
-            int handshake();
-            
-            FleXdLoggerServer(const FleXdLoggerServer& orig) = delete;
+            //int handshake();
+            int handshake(FleXdLogStream& hsMsg);
+
+            FleXdLoggerServer(const FleXdLoggerServer&) = delete;
+            FleXdLoggerServer& operator=(const FleXdLoggerServer&) = delete;
+            FleXdLoggerServer(FleXdLoggerServer&&) = delete;
+            FleXdLoggerServer& operator=(FleXdLoggerServer&&) = delete;
+
         private:
-            bool logToSysLog(FleXdLogMessage& message); 
+            bool logToSysLog(FleXdLogStream& message);
             void writeLog(const std::string appName,const uint64_t time, const std::string priority, const std::string message);
+
         private:
-            FleXdAppArray m_arrayOfApp;
-            //TODO IPC (now it run on sockets)
-            //FleXdLoggerIPC m_loggerIPC;
-            iSocServer* m_socServer;
+            std::shared_ptr<FleXdAppArray> m_arrayOfApp;
             FleXdLoggerDlt* m_fleXdLoggerDlt;
+            FleXdLoggerIPC m_loggerIPCServer;
         };
-        
+
     } // namespace logger
-} // namespace flexd       
+} // namespace flexd
 
 #endif /* FLEXLOGGERSERVER_H */
 

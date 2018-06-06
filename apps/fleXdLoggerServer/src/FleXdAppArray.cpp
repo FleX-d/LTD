@@ -103,7 +103,6 @@ namespace flexd {
             return -2;
         }
 
-
         std::string FleXdAppArray::getAppName(uint16_t appID) const {
             if (m_list[appID].get()) {
                 return m_list[appID]->getAppName();
@@ -123,7 +122,7 @@ namespace flexd {
             return nullptr;
         }
         
-        bool FleXdAppArray::unconnectApplication(int desctiptor) {
+        bool FleXdAppArray::disconnectApplication(int desctiptor) {
             for (auto& ref : m_list) {
                 if (ref.get()) {
                     if (ref->getAppDescriptor() == desctiptor) {
@@ -134,7 +133,6 @@ namespace flexd {
             }
             return false;
         }
-
 
         bool FleXdAppArray::removeFromArray(int appDescriptor) {
             for (auto ref : m_list) {
@@ -147,11 +145,6 @@ namespace flexd {
                 }
             }
             return false;
-        }
-        
-        
-
-        FleXdAppArray::~FleXdAppArray() {
         }
         
     } // namespace logger

@@ -16,9 +16,15 @@ set_property(
 option(
     ENABLE_TESTS
     "Build tests?"
+    OFF
+)
+option(
+    LOG_TO_DLT
+    "Build tests?"
     ON
 )
 message(STATUS "option ENABLE_TESTS=" ${ENABLE_TESTS})
+message(STATUS "option LOG_TO_DLT=" ${LOG_TO_DLT})
 
 include(ExternalProject)
 find_package(Git REQUIRED)

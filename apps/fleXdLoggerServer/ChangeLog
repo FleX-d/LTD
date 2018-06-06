@@ -114,3 +114,12 @@ All notable changes to this project will be documented in this file.
 ### Removed
 - None
 
+## [0.0.1] - 2018-06-06 [Jakub Pekar]
+### Added
+- Implementation of ICL to functional version
+### Changed
+- relocated the LogMessage(LogStream) to the common project for client and server -> removing of duplicates
+### Removed
+- Sockets
+- LogMessage
+

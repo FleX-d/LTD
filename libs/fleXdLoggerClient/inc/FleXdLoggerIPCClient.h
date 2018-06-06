@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017, Globallogic s.r.o.
+Copyright (c) 2018, Globallogic s.r.o.
 All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -23,54 +23,56 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* 
- * File:   iSocServer.h
- * Author: Jakub Pekar
+
+/*
+ * File:   FleXdLoggerIPCClient.h
+ * Author: dev
+ *
+ * Created on May 23, 2018, 3:54 PM
  */
 
+#ifndef FLEXDLOGGERIPCCLIENT_H
+#define FLEXDLOGGERIPCCLIENT_H
 
-#ifndef ISOCSERVER_H
-#define ISOCSERVER_H
-#include <stdint.h>
+#include <string>
+#include "FleXdEpoll.h"
+#include "FleXdIPCProxyBuilder.h"
+#include "FleXdIPCMsg.h"
+#include "FleXdUDSClient.h"
+#include "FleXdLogBuffer.h"
 
-#include <stdio.h>
-#include <sys/socket.h>
-#include <stdlib.h>
-#include <netinet/in.h>
-#include <string.h>
+namespace flexd {
+    namespace logger {
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <iostream>
-#include <stdbool.h>
-#include <cerrno>
+        class FleXdLoggerIPCClient : public flexd::icl::ipc::FleXdIPCProxyBuilder<flexd::icl::ipc::FleXdUDSClient> {
+        public:
+            FleXdLoggerIPCClient(std::shared_ptr<FleXdLogBuffer> logBuffer, flexd::icl::ipc::FleXdEpoll& poller);
+            virtual ~FleXdLoggerIPCClient() = default;
 
-class iSocServer {
-public:
-    iSocServer();
-    iSocServer(const iSocServer& orig) = delete;
-    ~iSocServer();
-    bool connectFunck(int port);
-    bool listenServer();
-    int connectClient();
-    bool send(int descriptor, void* buffer, uint16_t size);
-    int receive(int descriptor, void* buffer, uint16_t size);
-    void printSocketfd();
-    
-private:
-    int server_fd; 
-    int new_socket; 
-    int opt;
-    int valread;
-    sockaddr_in address;
-    int addrlen;
-    char buffer[1024];
-};
+            virtual void rcvMsg(flexd::icl::ipc::pSharedFleXdIPCMsg msg, int fd = 0) override;
+            void onConnect(bool ret);
+            void onDisconnect(bool ret);
 
-#endif /* ISOCSERVER_H */
+            void setName(std::string name);
+            std::string getName()const;
+            uint16_t getAppID()const;
+            bool isConnected();
+
+            void flushBuffer();
+
+            FleXdLoggerIPCClient(const FleXdLoggerIPCClient&) = delete;
+
+        private:
+            bool handshake();
+            
+        private:
+            bool m_connectionToServer;
+            std::string m_appName;
+            uint16_t m_appIDuint;
+            std::shared_ptr<FleXdLogBuffer> m_logBuffer;
+        };
+
+    } // namespace logger
+} // namespace flexd
+#endif /* FLEXDLOGGERIPCCLIENT_H */
 
