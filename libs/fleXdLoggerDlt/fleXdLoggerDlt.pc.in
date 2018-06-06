@@ -8,5 +8,9 @@ Description: @PROJECT_DESCRIPTION@
 Version: @PROJECT_VERSION@
 
 Requires:
+<<<<<<< HEAD
 Libs: -L${libdir} -l@PROJECT_NAME@ -ldlt 
+=======
+Libs: -L${libdir} -l@PROJECT_NAME@ -ldlt
+>>>>>>> 8228d3061740c22980c9fee21cad3db09cf6ce6f
 Cflags: -I${includedir}
