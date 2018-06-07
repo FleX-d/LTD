@@ -31,27 +31,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FLEXDLOGGERIPC_H
 #define FLEXDLOGGERIPC_H
 
+#include <memory>
 #include "FleXdIPCProxyBuilder.h"
 #include "FleXdEpoll.h"
 #include "FleXdUDSServer.h"
 #include "FleXdLogStream.h"
 #include "FleXdAppArray.h"
 
+#ifdef DLT_ENABLED
+    #include "FleXdLoggerDlt.h"
+#endif /*DLT_ENABLED*/
+
 namespace flexd {
     namespace logger {
 
-        class FleXdLoggerIPC : public flexd::icl::ipc::FleXdIPCProxyBuilder<flexd::icl::ipc::FleXdUDSServer>
+        class FleXdLoggerIPCServer : public flexd::icl::ipc::FleXdIPCProxyBuilder<flexd::icl::ipc::FleXdUDSServer>
         {
         public:
-            FleXdLoggerIPC(std::shared_ptr<FleXdAppArray> appArray, flexd::icl::ipc::FleXdEpoll& poller, std::function<bool(FleXdLogStream&)> logging);
-            virtual ~FleXdLoggerIPC() = default;
+            FleXdLoggerIPCServer(std::shared_ptr<FleXdAppArray> appArray, flexd::icl::ipc::FleXdEpoll& poller, std::function<bool(FleXdLogStream&)> logging, bool logToDlt);
+            virtual ~FleXdLoggerIPCServer() = default;
 
             virtual void rcvMsg(flexd::icl::ipc::pSharedFleXdIPCMsg msg, int fd) override;
             void onConnectClient(int fd);
             void onDisconnectClient(int fd);
 
-            FleXdLoggerIPC(const FleXdLoggerIPC& orig) = delete;
-            FleXdLoggerIPC& operator=(const FleXdLoggerIPC&) = delete;
+            FleXdLoggerIPCServer(const FleXdLoggerIPCServer& orig) = delete;
+            FleXdLoggerIPCServer& operator=(const FleXdLoggerIPCServer&) = delete;
+
+            /**
+            * Function set on the client side the logLevel for filtering of logs.
+            * @param appName - application identifier for which the log level should be changed
+            * @param logLevel - log level value
+            * @return true if set is successful, false otherwise
+            */
+            bool setLogLevel(const std::string& appName, MsgType::Enum logLevel);
 
         private:
             bool handshake(FleXdLogStream& hsMsg, int fd);
@@ -59,8 +72,10 @@ namespace flexd {
         private:
             std::shared_ptr<FleXdAppArray> m_appArray;
             std::function<bool(FleXdLogStream&)> m_logging;
+#ifdef DLT_ENABLED
+            std::unique_ptr<FleXdLoggerDlt> m_fleXdLoggerDlt;
+#endif /*DLT_ENABLED*/
             std::vector<int> m_undefineFD;
-
         };
 
     } // namespace logger

@@ -31,17 +31,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FLEXLOGGERSERVER_H
 #define FLEXLOGGERSERVER_H
 
-
 #include "FleXdLogStream.h"
 #include "FleXdMessageType.h"
 #include "FleXdAppArray.h"
 #include "FleXdLoggerIPCServer.h"
-#include "FleXdLoggerDlt.h"
 #include "FleXdEpoll.h"
 #include <sstream>
 #include <thread>
 #include <syslog.h>
-#include <string>
 
 namespace flexd {
     namespace logger {
@@ -50,18 +47,17 @@ namespace flexd {
         public:
             explicit FleXdLoggerServer(flexd::icl::ipc::FleXdEpoll& poller, bool logToDlt = false);
             virtual ~FleXdLoggerServer();
-             /**
+            /**
             * Function set on the client side the logLevel for filtering of logs.
             * @param appName - application identifier for which the log level should be changed
             * @param logLevel - log level value
             * @return true if set is successful, false otherwise
             */
             bool setLogLevel(const std::string& appName, MsgType::Enum logLevel);
-             /**
+            /**
             * Function await the client connection, than accept name of client and insert it to the AppArray, if its name is unique.
             * @return file descriptor of connected client, when occurred problem return negative value
             */
-            //int handshake();
             int handshake(FleXdLogStream& hsMsg);
 
             FleXdLoggerServer(const FleXdLoggerServer&) = delete;
@@ -75,8 +71,7 @@ namespace flexd {
 
         private:
             std::shared_ptr<FleXdAppArray> m_arrayOfApp;
-            FleXdLoggerDlt* m_fleXdLoggerDlt;
-            FleXdLoggerIPC m_loggerIPCServer;
+            FleXdLoggerIPCServer m_loggerIPCServer;
         };
 
     } // namespace logger

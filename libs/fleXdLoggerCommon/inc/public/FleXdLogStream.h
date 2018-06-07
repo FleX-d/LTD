@@ -69,48 +69,48 @@ namespace flexd {
             FleXdLogStream(FleXdLogStream&& stream) : BitStream(std::move(stream)) {}
             FleXdLogStream& operator=(FleXdLogStream&&) = delete;
             virtual ~FleXdLogStream() = default;
-            /*
-             * Function parses the appID from BitStream
-             * @return appID from stream
-             */
+            /**
+            * Function parses the appID from BitStream
+            * @return appID from stream
+            */
             uint16_t getAppID() { return BitStream::getWithOffset<uint16_t>(0, sizeof(uint16_t)*8); }
-            /*
-             * Function parses the time of log from BitStream
-             * @return appID from stream
-             */
+            /**
+            * Function parses the time of log from BitStream
+            * @return appID from stream
+            */
             uint64_t getTime() { return BitStream::getWithOffset<uint64_t>(OFFSET_TIME, sizeof(uint64_t)*8); }
-            /*
-             * Function parses the message type from BitStream
-             * @return message type from stream
-             */
+            /**
+            * Function parses the message type from BitStream
+            * @return message type from stream
+            */
             uint8_t getMsgType() { return BitStream::getWithOffset<uint8_t>(OFFSET_MSGTYPE, sizeof(uint8_t)*8); }
-            /*
-             * Function parses the message counter from BitStream
-             * @return message counter from stream
-             */
+            /**
+            * Function parses the message counter from BitStream
+            * @return message counter from stream
+            */
             uint8_t getMsgCounter() { return BitStream::getWithOffset<uint8_t>(OFFSET_MSGCOUNTER, sizeof(uint8_t)*8); }
-            /*
-             * Function parses the payload length from BitStream
-             * @return payload length from stream
-             */
+            /**
+            * Function parses the payload length from BitStream
+            * @return payload length from stream
+            */
             uint16_t getMsgSize() { return BitStream::getWithOffset<uint16_t>(OFFSET_MSGSIZE, sizeof(uint16_t)*8); }
-            /*
-             * Function parses payload from BitStream
-             * @return payload from message
-             */
+            /**
+            * Function parses payload from BitStream
+            * @return payload from message
+            */
             std::string getMessage() {
                 getMsgSize();
                 std::vector<uint8_t> data = BitStream::getRest();
                 return std::string(data.begin(), data.end());
             }
-            /*
-             * Function returns header size
-             * @return header size
-             */
+            /**
+            * Function returns header size
+            * @return header size
+            */
             static uint8_t getHeadersize() { return APPID_SIZE + TIME_SIZE + MSGTYPE_SIZE + MSGCOUNTER_SIZE + MSGLENGTH_SIZE; }
-            /*
-             * Function parse message from BitStream to readable form and prints log to console
-             */
+            /**
+            * Function parse message from BitStream to readable form and prints log to console
+            */
             void logToCout() {
                 std::cout << "AppID: " << std::to_string(getAppID())
                         << " Time: " << std::to_string(getTime())

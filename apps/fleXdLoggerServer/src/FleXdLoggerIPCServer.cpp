@@ -37,16 +37,36 @@ using namespace flexd::icl::ipc;
 namespace flexd {
     namespace logger {
 
-        FleXdLoggerIPC::FleXdLoggerIPC(std::shared_ptr<FleXdAppArray> appArray, FleXdEpoll& poller, std::function<bool(FleXdLogStream&)> logging)
-        : FleXdIPCProxyBuilder<FleXdUDSServer>("/tmp/FleXd/shared/ipc/uds/fleXdLogger.soc", poller),
+        FleXdLoggerIPCServer::FleXdLoggerIPCServer(std::shared_ptr<FleXdAppArray> appArray, FleXdEpoll& poller, std::function<bool(FleXdLogStream&)> logging, bool logToDlt)
+        : FleXdIPCProxyBuilder<FleXdUDSServer>("/tmp/fleXdLogger.soc", poller),
           m_appArray(appArray),
-          m_logging(logging)
+          m_logging(logging),
+#ifdef DLT_ENABLED
+          m_fleXdLoggerDlt(nullptr),
+#endif /*DLT_ENABLED*/
+          m_undefineFD()
         {
             this->setOnConnectClient([this](int fd){ this->onConnectClient(fd); });
             this->setOnDisconnectClient([this](int fd){ this->onDisconnectClient(fd); });
+
+#ifdef DLT_ENABLED
+            // Enable logging to Dlt
+            if (logToDlt) {
+                m_fleXdLoggerDlt = std::make_unique<FleXdLoggerDlt>();
+            }
+#endif /*DLT_ENABLED*/
         }
 
-        bool FleXdLoggerIPC::handshake(FleXdLogStream& hsMsg, int fd)
+        bool FleXdLoggerIPCServer::setLogLevel(const std::string& appName, MsgType::Enum logLevel) {
+#ifdef DLT_ENABLED
+            if (m_fleXdLoggerDlt != nullptr) {
+                return m_fleXdLoggerDlt->setLogLevel(appName, logLevel);
+            }
+#endif /*DLT_ENABLED*/
+            return true;
+        }
+
+        bool FleXdLoggerIPCServer::handshake(FleXdLogStream& hsMsg, int fd)
         {
             auto it = std::find(m_undefineFD.begin(), m_undefineFD.end(), fd);
             if (it != m_undefineFD.end()) {
@@ -60,11 +80,13 @@ namespace flexd {
 		    
                     auto sendingIPCLog = std::make_shared<FleXdIPCMsg>((uint8_t) MsgType::Enum::HANDSHAKESUCCES, std::move(ackMessage.releaseData()));
                     this->sndMsg(sendingIPCLog, fd);
-
-                    //TODO register application for Dlt logging, check the return value
-                    //if (m_fleXdLoggerDlt != nullptr) {
-                    //    m_fleXdLoggerDlt->registerApp( ... );
-                    //}
+#ifdef DLT_ENABLED
+                    //Register application for Dlt logging
+                    if (m_fleXdLoggerDlt != nullptr) {
+                        //TODO check the return value
+                        m_fleXdLoggerDlt->registerApp(m_appArray->getAppName(appId), m_appArray->getAppName(appId));
+                    }
+#endif /*DLT_ENABLED*/
                     return true;
                 } else if (appId == -1) {
 		    std::string msg = std::string("This applications name *(") + hsMsg.getMessage() + std::string(")* using other client.");
@@ -87,7 +109,7 @@ namespace flexd {
             }
         }
 
-        void FleXdLoggerIPC::rcvMsg(pSharedFleXdIPCMsg msg, int fd) {
+        void FleXdLoggerIPCServer::rcvMsg(pSharedFleXdIPCMsg msg, int fd) {
             if(msg)
             {
                 if(!msg->getHeaderParamType()){
@@ -107,11 +129,11 @@ namespace flexd {
             }
         }
 
-        void FleXdLoggerIPC::onConnectClient(int fd) {
+        void FleXdLoggerIPCServer::onConnectClient(int fd) {
             m_undefineFD.push_back(fd);
         }
 
-        void FleXdLoggerIPC::onDisconnectClient(int fd) {
+        void FleXdLoggerIPCServer::onDisconnectClient(int fd) {
             m_appArray->disconnectApplication(fd);
         }
 
