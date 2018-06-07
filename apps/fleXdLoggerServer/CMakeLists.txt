@@ -49,9 +49,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE inc/
     ${FLEXDIPCCOMMON_INCLUDE_DIRS}
 )
 
-if(${LOG_TO_DLT})
+if(${WITH_DLT})
     target_include_directories(${PROJECT_NAME} PRIVATE ${fleXdLoggerDltPublicInc})
-endif(${LOG_TO_DLT})
+endif(${WITH_DLT})
 
 target_compile_options(${PROJECT_NAME} PUBLIC -std=c++14 -Wall -Wfloat-conversion)
 target_link_libraries(${PROJECT_NAME}
@@ -59,11 +59,11 @@ target_link_libraries(${PROJECT_NAME}
         ${FLEXDEPOLL_LIBRARIES}
         ${FLEXDIPCCOMMON_LIBRARIES}
     )
-if(${LOG_TO_DLT})
+if(${WITH_DLT})
     target_link_libraries(${PROJECT_NAME}
         ${fleXdLoggerDltLib}
     )
-endif(${LOG_TO_DLT})
+endif(${WITH_DLT})
 
 install(TARGETS ${PROJECT_NAME}
     DESTINATION ${CMAKE_BINARY_DIR})
@@ -72,9 +72,9 @@ add_dependencies(${PROJECT_NAME}
     bitstream
     fleXdLoggerCommon
 )
-if(${LOG_TO_DLT})
+if(${WITH_DLT})
     add_dependencies(${PROJECT_NAME} fleXdLoggerDlt)
-endif(${LOG_TO_DLT})
+endif(${WITH_DLT})
 
 SET(fleXdLoggerServerInc "${fleXdLoggerServer_SOURCE_DIR}/inc" CACHE STRING "")
 

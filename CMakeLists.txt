@@ -19,12 +19,12 @@ option(
     OFF
 )
 option(
-    LOG_TO_DLT
-    "Build tests?"
-    ON
+    WITH_DLT
+    "Build with dlt?"
+    OFF
 )
 message(STATUS "option ENABLE_TESTS=" ${ENABLE_TESTS})
-message(STATUS "option LOG_TO_DLT=" ${LOG_TO_DLT})
+message(STATUS "option WITH_DLT=" ${WITH_DLT})
 
 include(ExternalProject)
 find_package(Git REQUIRED)

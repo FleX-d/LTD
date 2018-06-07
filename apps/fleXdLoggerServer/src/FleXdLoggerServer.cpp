@@ -38,16 +38,10 @@ namespace flexd {
 
         FleXdLoggerServer::FleXdLoggerServer(flexd::icl::ipc::FleXdEpoll& poller, bool logToDlt /*= false*/)
         : m_arrayOfApp(new FleXdAppArray()),
-          m_fleXdLoggerDlt(nullptr),
-          m_loggerIPCServer(m_arrayOfApp, poller, [&](FleXdLogStream& message)->bool{ return logToSysLog(message); })
+          m_loggerIPCServer(m_arrayOfApp, poller, [&](FleXdLogStream& message)->bool{ return logToSysLog(message); }, logToDlt)
         {
             openlog("FLEXLOGGER", LOG_CONS, LOG_LOCAL0);
             writeLog("FleXdLoggerServer",0,"INFO"," -> Init");
-
-            // Enable logging to Dlt
-            if (logToDlt) {
-                m_fleXdLoggerDlt = new FleXdLoggerDlt();
-            }
             m_loggerIPCServer.init();
         }
 
@@ -96,7 +90,6 @@ namespace flexd {
                     appName.c_str(), timeVal, priority.c_str(), message.c_str());
         }
 
-
         bool FleXdLoggerServer::setLogLevel(const std::string& appName, MsgType::Enum logLevel) {
             // TODO browse map and set log level for required app
             // check if app is active and if yes send sysMsg for change loglevel
@@ -104,10 +97,8 @@ namespace flexd {
             std::shared_ptr<FleXdApplication> app = m_arrayOfApp->getApp(appName);
             app->setLogLevel(logLevel);
 
-            //TODO set log level for application when Dlt logging is enabled, check the return value
-            //if (m_fleXdLoggerDlt != nullptr) {
-            //    m_fleXdLoggerDlt->setLogLevel( ... );
-            //}
+            //TODO check the return value
+            m_loggerIPCServer.setLogLevel(appName, logLevel);
 
             if(app->isOnline())
             {/*
@@ -126,15 +117,12 @@ namespace flexd {
                 */
             }
 
-            writeLog("FleXdLoggerServer",0,"INFO"," -> Set the log level on: " + appName + ". Application is offline");
+            writeLog("FleXdLoggerServer", 0, "INFO", " -> Set the log level on: " + appName + ". Application is offline");
             return true;
 
         }
 
         FleXdLoggerServer::~FleXdLoggerServer() {
-            if (m_fleXdLoggerDlt != nullptr) {
-                delete m_fleXdLoggerDlt;
-            }
             closelog();
         }
 

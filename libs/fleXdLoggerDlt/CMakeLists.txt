@@ -36,7 +36,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE inc/
 
     ${fleXdLoggerCommonPublicInc}
 )
-target_compile_options(${PROJECT_NAME} PUBLIC -std=c++14 -Wall -Wfloat-conversion)
+target_compile_options(${PROJECT_NAME} PUBLIC -std=c++14 -Wall -Wfloat-conversion -DDLT_ENABLED)
 
 target_link_libraries(${PROJECT_NAME}
     ${DLT_LIBRARIES}
@@ -47,7 +47,7 @@ install(TARGETS ${PROJECT_NAME}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(FILES ${CMAKE_BINARY_DIR}/libs/fleXdLoggerDlt/${PROJECT_NAME}.pc
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
-    
+
 SET(fleXdLoggerDltPublicInc "${fleXdLoggerDlt_SOURCE_DIR}/inc/public" CACHE STRING "")
 SET(fleXdLoggerDltLib "${PROJECT_NAME}" CACHE STRING "")
 message(STATUS "*Export fleXdLoggerDltPublicInc: " ${fleXdLoggerDltPublicInc})
