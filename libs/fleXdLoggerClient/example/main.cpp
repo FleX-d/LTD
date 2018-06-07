@@ -49,10 +49,10 @@ int main(int argc, char** argv) {
     }
     bool init = FLEX_LOG_INIT(poller, appname)
 
-    FLEX_LOG_DEBUG(" -> This is debug log.");
-    FLEX_LOG_INFO(" -> This is info log.");
-    FLEX_LOG_FATAL(" -> This is fatal error log. Thia is very big problem.");
-    FLEX_LOG_ERROR(" -> This is error log. This is smaller problem.");
+    FLEX_LOG_DEBUG(" -> first log - This is debug log.");
+    FLEX_LOG_INFO(" -> second log - This is info log.");
+    FLEX_LOG_FATAL(" -> third log - This is fatal error log. This is very big problem.");
+    FLEX_LOG_ERROR(" -> fourth log - This is error log.");
 
     if (init)
     {

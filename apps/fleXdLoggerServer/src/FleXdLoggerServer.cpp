@@ -41,7 +41,7 @@ namespace flexd {
           m_fleXdLoggerDlt(nullptr),
           m_loggerIPCServer(m_arrayOfApp, poller, [&](FleXdLogStream& message)->bool{ return logToSysLog(message); })
         {
-            openlog("FLEXLOGGER", LOG_CONS, LOG_LOCAL0);
+            openlog("FLEXDLOGGER", LOG_CONS, LOG_LOCAL0);
             writeLog("FleXdLoggerServer",0,"INFO"," -> Init");
 
             // Enable logging to Dlt
@@ -73,12 +73,21 @@ namespace flexd {
                 case MsgType::Enum::FATAL:
                     priority = "FATAL";
                     break;
+		case MsgType::Enum::HANDSHAKESUCCES:
+		    priority = "HANDSHAKESUCCES";
+		    break;
+		case MsgType::Enum::HANDSHAKEFAIL:
+		    priority = "HANDSHAKEFAIL";
+		    break;
                 default:
                     priority = "SYSTEM/UNKNOW";
                     break;
             }
-            writeLog(m_arrayOfApp->getAppName(message.getAppID()), message.getTime(), priority, message.getMessage());
-
+            if(message.getAppID() == 0){
+	      writeLog("FleXdLoggerServer", message.getTime(), priority, message.getMessage());
+	    } else {
+	      writeLog(m_arrayOfApp->getAppName(message.getAppID()), message.getTime(), priority, message.getMessage());
+	    }
             return true;
         }
 
@@ -91,6 +100,7 @@ namespace flexd {
             } else {
                 timeVal = time;
             }
+            
             std::cout << "[" << appName << "]" << "[" << std::to_string(timeVal) << "]" << "[" << priority << "] : " << message << std::endl;
             syslog(sysLogType,"[%s][%ld][%s] %s ",
                     appName.c_str(), timeVal, priority.c_str(), message.c_str());

@@ -143,7 +143,6 @@ namespace flexd {
             bool m_connectionToServer;
             std::string m_appName;
             uint16_t m_appIDuint;
-            LogLevel::Enum m_flexLogLevel;
             std::shared_ptr<FleXdLogBuffer> m_logBuffer;
             std::unique_ptr<FleXdLoggerIPCClient> m_IPCClient;
 

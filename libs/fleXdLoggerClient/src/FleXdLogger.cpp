@@ -55,6 +55,26 @@ namespace {
                 return flexd::logger::MsgType::Enum::ERROR;
         }
     }
+    
+    flexd::logger::LogLevel::Enum msgTypeToLogLevel(flexd::logger::MsgType::Enum msgType) {
+        switch (msgType) {
+            case flexd::logger::MsgType::Enum::VERBOSE:
+                return flexd::logger::LogLevel::Enum::VERBOSE;
+            case flexd::logger::MsgType::Enum::DEBUG:
+                return flexd::logger::LogLevel::Enum::DEBUG;
+            case flexd::logger::MsgType::Enum::INFO:
+                return flexd::logger::LogLevel::Enum::INFO;
+            case flexd::logger::MsgType::Enum::WARN:
+                return flexd::logger::LogLevel::Enum::WARN;
+            case flexd::logger::MsgType::Enum::ERROR:
+                return flexd::logger::LogLevel::Enum::ERROR;
+            case flexd::logger::MsgType::Enum::FATAL:
+                return flexd::logger::LogLevel::Enum::FATAL;
+            default:
+                //TODO: default value
+                return flexd::logger::LogLevel::Enum::ERROR;
+        }
+    }
 }
 
 namespace flexd {
@@ -64,7 +84,6 @@ namespace flexd {
         : m_connectionToServer(false),
           m_appName(""),
           m_appIDuint(0),
-          m_flexLogLevel(LogLevel::Enum::VERBOSE),
           m_logBuffer(new FleXdLogBuffer(FLEXDLOGGER_MAXLOGBUFFERSIZE)),
           m_IPCClient(nullptr),
           m_msgCount(0) {
@@ -93,19 +112,20 @@ namespace flexd {
         }
 
         void FleXdLogger::writeLog(LogLevel::Enum logLevel, std::time_t time, const std::string& level, const std::string& stream) {
+	  if(msgTypeToLogLevel(m_IPCClient->getLogLvlFilter()) <= logLevel){
             writeLogToBuffer(logLevel, stream, time);
             if (m_IPCClient && !m_IPCClient->isConnected()) {
                std::cout << "FleXdLogger::[" << m_IPCClient->getName() << "][" << m_IPCClient->getAppID() << "][" << time <<"][" << level << "] : " << stream << std::endl;
             }
+	  }
         }
 
         void FleXdLogger::writeLogToBuffer(const LogLevel::Enum logLevel, const std::string& stream, time_t time) {
-            if (logLevel >= m_flexLogLevel) {
                 LogData logData{time, logLevelToMsgType(logLevel), m_msgCount, stream};
                 m_logBuffer->push(std::move(logData));
                 m_msgCount++;
                 if (m_IPCClient) m_IPCClient->flushBuffer();
-            }
+            
         }
 
         void FleXdLogger::handshake() {

@@ -38,7 +38,7 @@ namespace flexd {
     namespace logger {
 
         FleXdLoggerIPC::FleXdLoggerIPC(std::shared_ptr<FleXdAppArray> appArray, FleXdEpoll& poller, std::function<bool(FleXdLogStream&)> logging)
-        : FleXdIPCProxyBuilder<FleXdUDSServer>("/tmp/fleXdLogger.soc", poller),
+        : FleXdIPCProxyBuilder<FleXdUDSServer>("/tmp/FleXd/shared/ipc/uds/fleXdLogger.soc", poller),
           m_appArray(appArray),
           m_logging(logging)
         {
@@ -54,8 +54,10 @@ namespace flexd {
                 int appId = m_appArray->insertToArray(hsMsg.getMessage(), fd);
                 if (appId > 0) {
                     FleXdLogStream ackMessage((uint16_t) appId, (uint8_t) MsgType::Enum::HANDSHAKESUCCES, 0, std::to_string(appId));
-                    std::cout << "*ACK-"<< hsMsg.getMessage() <<  "* -> ";
-                    ackMessage.logToCout();
+                    /*std::cout << "*ACK-"<< hsMsg.getMessage() <<  "* -> ";
+                    ackMessage.logToCout();*/
+		    m_logging(ackMessage);
+		    
                     auto sendingIPCLog = std::make_shared<FleXdIPCMsg>((uint8_t) MsgType::Enum::HANDSHAKESUCCES, std::move(ackMessage.releaseData()));
                     this->sndMsg(sendingIPCLog, fd);
 
@@ -65,17 +67,20 @@ namespace flexd {
                     //}
                     return true;
                 } else if (appId == -1) {
-                    FleXdLogStream ackMessage(appId, (uint8_t) MsgType::Enum::HANDSHAKEFAIL, 0, std::string("***This application name using other client***"));
-                    std::cout << "*ACK-"<< hsMsg.getMessage() <<  "* -> ";
-                    ackMessage.logToCout();
+		    std::string msg = std::string("This applications name *(") + hsMsg.getMessage() + std::string(")* using other client.");
+                    FleXdLogStream ackMessage(0, (uint8_t) MsgType::Enum::HANDSHAKEFAIL, 0, msg);
+                   /* std::cout << "*ACK-"<< hsMsg.getMessage() <<  "* -> ";
+                    ackMessage.logToCout();*/
+		    m_logging(ackMessage);
                     auto sendingIPCLog  = std::make_shared<FleXdIPCMsg>((uint8_t) MsgType::Enum::HANDSHAKEFAIL, std::move(ackMessage.releaseData()));
                     this->sndMsg(sendingIPCLog, fd);
 
                     return false;
-                } else {
+                } else {  
+		  //TODO send ACK if is impossible accept next client
                     return false;
                 }
-                //TODO send ACK if is impossible accept next client
+                
             } else {
                 //TODO handshake already done or descriptor missing in m_undefineFD
                 return false;

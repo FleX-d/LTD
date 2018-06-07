@@ -33,17 +33,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 #include "FleXdLoggerIPCClient.h"
-#include "FleXdMessageType.h"
 
 using namespace flexd::icl::ipc;
 namespace flexd {
     namespace logger {
 
         FleXdLoggerIPCClient::FleXdLoggerIPCClient(std::shared_ptr<FleXdLogBuffer> logBuffer, flexd::icl::ipc::FleXdEpoll& poller)
-        : FleXdIPCProxyBuilder<FleXdUDSClient>("/tmp/fleXdLogger.soc", poller),
+        : FleXdIPCProxyBuilder<FleXdUDSClient>("/tmp/FleXd/shared/ipc/uds/fleXdLogger.soc", poller),
           m_connectionToServer(false),
           m_appName(""),
           m_appIDuint(0),
+          m_flexLogLevel(MsgType::Enum::VERBOSE),
           m_logBuffer(logBuffer) {
             this->setOnConnect([this](bool ret){ this->onConnect(ret); });
             this->setOnDisconnect([this](bool ret){ this->onDisconnect(ret); });
@@ -60,6 +60,9 @@ namespace flexd {
         std::string FleXdLoggerIPCClient::getName() const {
             return  m_appName;
         }
+        MsgType::Enum FleXdLoggerIPCClient::getLogLvlFilter(){
+	  return m_flexLogLevel;
+	}
 
         bool FleXdLoggerIPCClient::isConnected() {
             return m_connectionToServer;
@@ -91,6 +94,7 @@ namespace flexd {
                             flushBuffer();
                             break;
                         case MsgType::Enum::HANDSHAKEFAIL:
+			    std::cout << "FleXdLogger::[" << m_appName << "][" << m_appIDuint << "][HandshakeFail] : " << "Handhake failure. This Name is using" << std::endl;
                             m_connectionToServer = false;
                             break;
                         case MsgType::SETLOGLEVEL://TODO  setting of loglevel
