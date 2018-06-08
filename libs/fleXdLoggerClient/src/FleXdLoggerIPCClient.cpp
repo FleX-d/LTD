@@ -94,7 +94,7 @@ namespace flexd {
                             flushBuffer();
                             break;
                         case MsgType::Enum::HANDSHAKEFAIL:
-			    std::cout << "FleXdLogger::[" << m_appName << "][" << m_appIDuint << "][HandshakeFail] : " << "Handhake failure. This Name is using" << std::endl;
+			    std::cout << "FleXdLogger::[" << m_appName << "][" << m_appIDuint << "][HandshakeFail] : " << "Handshake failure. This Name is using" << std::endl;
                             m_connectionToServer = false;
                             break;
                         case MsgType::SETLOGLEVEL://TODO  setting of loglevel
