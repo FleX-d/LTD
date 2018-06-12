@@ -37,7 +37,7 @@ namespace flexd {
             virtual ~FleXdLogBuffer() = default;
              /**
             * Function inserts the logStream on the back queue.
-            * @param logStream - inserted log
+            * @param logData - inserted log
             * @return true after successful inserting
             */
             bool push(LogData&& logData);

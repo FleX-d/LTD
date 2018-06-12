@@ -66,14 +66,14 @@ SET(fleXdLoggerClientLib "${PROJECT_NAME}" CACHE STRING "")
 message(STATUS "*Export fleXdLoggerClientPublicInc: " ${fleXdLoggerClientPublicInc})
 message(STATUS "*Export fleXdLoggerClientLib: " ${fleXdLoggerClientLib})
 
-
-#TODO avoid build examples by defualt
-add_subdirectory(example)
-
 add_dependencies(${PROJECT_NAME}
     bitstream
     fleXdLoggerCommon
-    )
+)
+
+if(${ENABLE_EXAMPLES})
+    add_subdirectory(example)
+endif(${ENABLE_EXAMPLES})
 
 if(${ENABLE_TESTS})
     add_subdirectory(gtest)

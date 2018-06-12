@@ -37,76 +37,74 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 flexd::logger::FleXdLogBuffer clientBuffer(128);    //max size of buffer in bytes
 flexd::logger::FleXdLogBuffer clientBuffer2(128);
-flexd::logger::FleXdLogBuffer clientBuffer3(128);  
+flexd::logger::FleXdLogBuffer clientBuffer3(128);
 
 namespace {
-    TEST(ClientBuffer,pushToTheBuffer){
+
+    TEST(ClientBuffer, pushToTheBuffer){
         std::string log("This is log message");
-        flexd::logger::LogStream stream1(32,15151515000,flexd::logger::MsgType::Enum::ERROR, 128, log);
-       
-        EXPECT_TRUE(clientBuffer.push(std::move(stream1)));
+        flexd::logger::LogData data = { 15151515000, flexd::logger::MsgType::Enum::ERROR, 128, log };
+
+        EXPECT_TRUE(clientBuffer.push(std::move(data)));
     }
-    
+
     TEST(ClientBuffer,getStreamFromTheBuffer_comparingOfStream){
         std::string log("This is log message");
-        flexd::logger::LogStream& stream1 = clientBuffer.getStream();
-       
-        EXPECT_EQ(stream1.getTime(),15151515000);
-        EXPECT_EQ(stream1.getAppID(),32);
-        EXPECT_EQ(stream1.getMessageCounter(),128);
-        EXPECT_EQ(stream1.getMessageType(),flexd::logger::MsgType::Enum::ERROR);
-        EXPECT_EQ(stream1.getMessageLength(),log.size());
-        EXPECT_EQ(stream1.getMessage(),log);
+        const flexd::logger::LogData* data = clientBuffer.getData();
+
+        EXPECT_EQ(data->time, 15151515000);
+        EXPECT_EQ(data->messageType, flexd::logger::MsgType::Enum::ERROR);
+        EXPECT_EQ(data->messageCounter, 128);
+        EXPECT_EQ(data->message, log);
     }
-    
+
     TEST(CLientBuffer,removeStreamFromBuffer){
         EXPECT_TRUE(clientBuffer.pop());
         EXPECT_FALSE(clientBuffer.pop());
     }
-    
+
     /* More complex tests*/
-    
+
     TEST(CLientBuffer,countingOfMessageInBuffer){
         std::string log("This is log message");
-        flexd::logger::LogStream stream1(32,15151515000,flexd::logger::MsgType::Enum::ERROR, 128, log);
+        flexd::logger::LogData data1 = { 15151515000, flexd::logger::MsgType::Enum::ERROR, 128, log };
         std::string log2("This is second log message");
-        flexd::logger::LogStream stream2(32,15151515111,flexd::logger::MsgType::Enum::ERROR, 129, log2);
+        flexd::logger::LogData data2 = { 15151515111, flexd::logger::MsgType::Enum::ERROR, 128, log2 };
         std::string log3("This is third log message");
-        flexd::logger::LogStream stream3(32,15151515222,flexd::logger::MsgType::Enum::ERROR, 130, log3);
-        
-        EXPECT_TRUE(clientBuffer2.push(std::move(stream1)));
-        EXPECT_TRUE(clientBuffer2.push(std::move(stream2)));
-        EXPECT_TRUE(clientBuffer2.push(std::move(stream3)));
+        flexd::logger::LogData data3 = { 15151515222, flexd::logger::MsgType::Enum::ERROR, 128, log3 };
+
+        EXPECT_TRUE(clientBuffer2.push(std::move(data1)));
+        EXPECT_TRUE(clientBuffer2.push(std::move(data2)));
+        EXPECT_TRUE(clientBuffer2.push(std::move(data3)));
         uint32_t bufferSize = log.size() + log2.size() + log3.size();
         EXPECT_EQ(bufferSize,clientBuffer2.getSizeBuffer());
-        
+
         bufferSize -= log.size();
         EXPECT_TRUE(clientBuffer2.pop());
         EXPECT_EQ(bufferSize,clientBuffer2.getSizeBuffer());
-        
+
         bufferSize -= log2.size();
         EXPECT_TRUE(clientBuffer2.pop());
         EXPECT_EQ(bufferSize,clientBuffer2.getSizeBuffer());
-        
+
         bufferSize -= log3.size();
         EXPECT_TRUE(clientBuffer2.pop());
         EXPECT_EQ(bufferSize,clientBuffer2.getSizeBuffer());
-        
+
         EXPECT_FALSE(clientBuffer2.pop());
     }
-    
+
     TEST(ClientBuffer,OverFlowIdentification){
-        
+
         for(int i = 0; i < 5; i++){
             std::string log("This is test log message!");
-            flexd::logger::LogStream stream(32,15151515000,flexd::logger::MsgType::Enum::ERROR, 128, log);
-            EXPECT_TRUE(clientBuffer3.push(std::move(stream)));
+            flexd::logger::LogData data = { 15151515000, flexd::logger::MsgType::Enum::ERROR, 128, log };
+            EXPECT_TRUE(clientBuffer3.push(std::move(data)));
         }
         // Buffer is full
         std::string log2("This is test log message!");
-        flexd::logger::LogStream stream(32,15151515000,flexd::logger::MsgType::Enum::ERROR, 128, log2);
-        EXPECT_FALSE(clientBuffer3.push(std::move(stream)));
+        flexd::logger::LogData data = { 15151515000, flexd::logger::MsgType::Enum::ERROR, 128, log2 };
+        EXPECT_FALSE(clientBuffer3.push(std::move(data)));
     }
-    
-    
+
 }

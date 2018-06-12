@@ -38,7 +38,7 @@ namespace flexd {
     namespace logger {
 
         FleXdLoggerIPCServer::FleXdLoggerIPCServer(std::shared_ptr<FleXdAppArray> appArray, FleXdEpoll& poller, std::function<bool(FleXdLogStream&)> logging, bool logToDlt)
-        : FleXdIPCProxyBuilder<FleXdUDSServer>("/tmp/fleXdLogger.soc", poller),
+        : FleXdIPCProxyBuilder<FleXdUDSServer>("/tmp/FleXd/shared/ipc/uds/fleXdLogger.soc", poller),
           m_appArray(appArray),
           m_logging(logging),
 #ifdef DLT_ENABLED
@@ -77,7 +77,7 @@ namespace flexd {
                     /*std::cout << "*ACK-"<< hsMsg.getMessage() <<  "* -> ";
                     ackMessage.logToCout();*/
 		    m_logging(ackMessage);
-		    
+
                     auto sendingIPCLog = std::make_shared<FleXdIPCMsg>((uint8_t) MsgType::Enum::HANDSHAKESUCCES, std::move(ackMessage.releaseData()));
                     this->sndMsg(sendingIPCLog, fd);
 #ifdef DLT_ENABLED
@@ -98,11 +98,11 @@ namespace flexd {
                     this->sndMsg(sendingIPCLog, fd);
 
                     return false;
-                } else {  
+                } else {
 		  //TODO send ACK if is impossible accept next client
                     return false;
                 }
-                
+
             } else {
                 //TODO handshake already done or descriptor missing in m_undefineFD
                 return false;

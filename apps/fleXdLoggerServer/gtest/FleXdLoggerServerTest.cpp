@@ -32,8 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include <gtest/gtest.h>
+#include <FleXdEpoll.h>
 #include "FleXdLoggerServer.h"
 
-flexd::logger::FleXdLoggerServer logger(false);
+// Create server
+flexd::icl::ipc::FleXdEpoll poller(10);
+flexd::logger::FleXdLoggerServer logger(poller, false);
 
-//TODO test for this class when IPC communication will be implement 
+//TODO test for this class when IPC communication will be implement

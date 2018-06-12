@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*
  * File:   FleXdAppArrayTest.cpp
- * 
+ *
  * Author: Jakub Pekar
  *
  * Created on May 10, 2018, 12:02 AM
@@ -43,58 +43,58 @@ namespace {
     flexd::logger::FleXdAppArray arrayComplex;
     flexd::logger::FleXdApplication application("Second",6);
     std::shared_ptr<flexd::logger::FleXdApplication> pApp;
-    
+
     /* Base tests of functionality */
-    
+
     TEST(Array,InsertToArray) {
         EXPECT_EQ(1, array.insertToArray("App",5));
         EXPECT_EQ(2, array.insertToArray("Second",6));
         EXPECT_EQ(-1, array.insertToArray("Second",7));
         EXPECT_EQ(3, array.insertToArray("reconnection",8));
-        
+
         pApp = array.getApp("Second");
     }
-    
-    
+
+
     TEST(Array,ReturnAppNameFromArray){
         EXPECT_STREQ("Second",array.getAppName(2).c_str());
     }
-    
+
     TEST(Array,AppReferenceReturn){
         EXPECT_EQ(pApp->getAppDescriptor(),application.getAppDescriptor());
         EXPECT_EQ(pApp->getLogLevel(),application.getLogLevel());
     }
-    
+
     TEST(Array,UnconnectApplication){
-        EXPECT_TRUE(array.unconnectApplication(6));
+        EXPECT_TRUE(array.disconnectApplication(6));
         EXPECT_FALSE(array.getApp("Second")->isOnline());
     }
-    
+
     TEST(Array,RemovingApplicationFromArray){
         EXPECT_FALSE(array.removeFromArray(10));
         EXPECT_TRUE(array.removeFromArray(6));
     }
     /** More complex tests of functionality **/
-    
+
     TEST(Array,TestOfOverFlowing){
         std::string appName;
         uint32_t maxCountOfApp = 1000;
         int appDescriptor = 5;
         std::string appString("app");
-        
+
         for(uint32_t countOfApp = 1; countOfApp < maxCountOfApp; countOfApp++){
             appName = appString + std::to_string(countOfApp);
             EXPECT_EQ(countOfApp, arrayComplex.insertToArray(appName,appDescriptor));
-            appDescriptor++;   
+            appDescriptor++;
         }
-        
+
     }
-    
+
     TEST(Array,ReconnectionOfApp){
         EXPECT_EQ(1, array2.insertToArray("App",5));
         EXPECT_EQ(2, array2.insertToArray("App1",6));
         EXPECT_EQ(3, array2.insertToArray("reconnection",7));
-        EXPECT_TRUE(array2.unconnectApplication(7));
+        EXPECT_TRUE(array2.disconnectApplication(7));
         EXPECT_FALSE(array2.getApp("reconnection")->isOnline());
         EXPECT_EQ(4, array2.insertToArray("appTest",11));
         EXPECT_EQ(3, array2.insertToArray("reconnection",11));

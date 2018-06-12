@@ -41,14 +41,14 @@ TEST(Application,setState){
     application.setOffline();
     EXPECT_FALSE(application.isOnline());
     application.setOnline();
-    EXPECT_TRUE(application.isOnline());    
+    EXPECT_TRUE(application.isOnline());
 }
 
 TEST(Application,ApplicationDescriptor){
     EXPECT_EQ(6,application.getAppDescriptor());
     application.setAppDescriptor(10);
     EXPECT_NE(6,application.getAppDescriptor());
-    EXPECT_EQ(10,application.getAppDescriptor());  
+    EXPECT_EQ(10,application.getAppDescriptor());
 }
 
 TEST(Application,LogLevel){

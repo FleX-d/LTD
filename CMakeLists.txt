@@ -19,11 +19,17 @@ option(
     OFF
 )
 option(
+    ENABLE_EXAMPLES
+    "Build examples?"
+    OFF
+)
+option(
     WITH_DLT
     "Build with dlt?"
     OFF
 )
 message(STATUS "option ENABLE_TESTS=" ${ENABLE_TESTS})
+message(STATUS "option ENABLE_EXAMPLES=" ${ENABLE_EXAMPLES})
 message(STATUS "option WITH_DLT=" ${WITH_DLT})
 
 include(ExternalProject)

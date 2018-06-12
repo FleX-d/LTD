@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [0.0.1] - 2018-06-12
+### Added
+- CMakeLists option to enable examples [Martin Strenger]
+
+### Changed
+- Corrected socket path for FleXdLoggerIPCServer to match Client side [Martin Strenger]
+- Updated signal handling for server application [Martin Strenger]
+- Fixed compile errors for unit tests [Martin Strenger]
+
+### Removed
+- None
+
 ## [0.0.1] - 2018-06-07
 ### Added
 - None

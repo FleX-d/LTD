@@ -32,25 +32,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 #include "FleXdLoggerServer.h"
 #include "FleXdEpoll.h"
+#include "FleXdEvent.h"
 
 #define CMD_LOG_TO_DLT "-dlt"
-
-
-void signalHandler(int s)
-{
-    // correct exit, loggerServer will be eventually unregistered from Dlt
-    exit(1);
-}
 
 int main(int argc, char** argv) {
     std::unique_ptr<flexd::logger::FleXdLoggerServer> loggerServer;
     bool logTodlt = false;
     bool argError = false;
 
-    // signal handling
-    signal(SIGABRT, signalHandler);
-    signal(SIGTERM, signalHandler);
-    signal(SIGINT, signalHandler);
 
     for (int i = 1; i < argc; ++i) { // Remember argv[0] is the path to the program, we want from argv[1] onwards
         // TODO: Check argument duplicity
@@ -73,8 +63,14 @@ int main(int argc, char** argv) {
 
     // Create server
     flexd::icl::ipc::FleXdEpoll poller(10); //TODO max number of events
-    loggerServer = std::make_unique<flexd::logger::FleXdLoggerServer>(poller, logTodlt);
-    poller.loop();
+    flexd::icl::ipc::FleXdTermEvent termEvent(poller);
+
+    if (termEvent.init()) {
+        loggerServer = std::make_unique<flexd::logger::FleXdLoggerServer>(poller, logTodlt);
+        poller.loop();
+    } else {
+        return -1;
+    }
 
     return 0;
 }
