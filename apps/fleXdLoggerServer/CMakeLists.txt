@@ -68,8 +68,7 @@ if(${WITH_DLT})
     )
 endif(${WITH_DLT})
 
-install(TARGETS ${PROJECT_NAME}
-    DESTINATION ${CMAKE_BINARY_DIR})
+install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 
 add_dependencies(${PROJECT_NAME}
     bitstream
