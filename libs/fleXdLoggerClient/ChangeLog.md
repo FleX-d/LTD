@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [0.0.1] - 2018-06-21
+### Added
+- None
+
+### Changed
+- Small code improvements [Martin Strenger]
+
+### Removed
+- None
+
 ## [0.0.1] - 2018-06-12
 ### Added
 - CMakeLists option to enable examples [Martin Strenger]

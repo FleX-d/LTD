@@ -7,8 +7,10 @@ message(STATUS "*  " ${PROJECT_NAME})
 message(STATUS "***" )
 
 message(STATUS "fleXdLoggerCommonPublicInc: " ${fleXdLoggerCommonPublicInc})
-message(STATUS "fleXdLoggerDltPublicInc: " ${fleXdLoggerDltPublicInc})
-message(STATUS "fleXdLoggerDltLib: " ${fleXdLoggerDltLib})
+if(${WITH_DLT})
+    message(STATUS "fleXdLoggerDltPublicInc: " ${fleXdLoggerDltPublicInc})
+    message(STATUS "fleXdLoggerDltLib: " ${fleXdLoggerDltLib})
+endif(${WITH_DLT})
 message(STATUS "BITSTREAM_INCLUDE_DIR:" ${BITSTREAM_INCLUDE_DIR})
 
 find_package(PkgConfig)

@@ -34,13 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FLEXDLOGGERIPCCLIENT_H
 #define FLEXDLOGGERIPCCLIENT_H
 
-#include <string>
-#include "FleXdEpoll.h"
-#include "FleXdIPCProxyBuilder.h"
-#include "FleXdIPCMsg.h"
 #include "FleXdMessageType.h"
-#include "FleXdUDSClient.h"
 #include "FleXdLogBuffer.h"
+#include <string>
+#include <FleXdEpoll.h>
+#include <FleXdIPCProxyBuilder.h>
+#include <FleXdIPCMsg.h>
+#include <FleXdUDSClient.h>
 
 namespace flexd {
     namespace logger {
@@ -66,7 +66,7 @@ namespace flexd {
 
         private:
             bool handshake();
-            
+
         private:
             bool m_connectionToServer;
             std::string m_appName;

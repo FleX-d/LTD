@@ -94,9 +94,9 @@ namespace flexd {
             } else {
                 timeVal = time;
             }
-            
+
             std::cout << "[" << appName << "]" << "[" << std::to_string(timeVal) << "]" << "[" << priority << "] : " << message << std::endl;
-            syslog(sysLogType,"[%s][%lld][%s] %s ",
+            syslog(sysLogType,"[%s][%lud][%s] %s ",
                     appName.c_str(), timeVal, priority.c_str(), message.c_str());
         }
 
