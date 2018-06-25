@@ -60,25 +60,33 @@ namespace flexd {
         std::string FleXdLoggerIPCClient::getName() const {
             return  m_appName;
         }
+
         MsgType::Enum FleXdLoggerIPCClient::getLogLvlFilter(){
-	  return m_flexLogLevel;
-	}
+            return m_flexLogLevel;
+        }
 
         bool FleXdLoggerIPCClient::isConnected() {
             return m_connectionToServer;
         }
 
         void FleXdLoggerIPCClient::flushBuffer() {
-            if (m_appIDuint != 0 && m_connectionToServer) {
-                while (m_logBuffer->getSizeBuffer()) {
-                    const LogData* data = m_logBuffer->getData();
-                    if (data != nullptr) {
-                        FleXdLogStream sendStream(m_appIDuint, data->messageType, data->messageCounter, data->message, data->time);
-                        sndMsg(std::make_shared<flexd::icl::ipc::FleXdIPCMsg>(data->messageType, std::move(sendStream.releaseData())));
+            if (m_appIDuint != 0 && m_connectionToServer && m_logBuffer) {
+                auto guard = m_logBuffer->getLock();
+                while (true) {
+                    guard.lock();
+                    if(m_logBuffer->getSizeBuffer()) {
+                        const LogData& data(m_logBuffer->front());
+                        FleXdLogStream sendStream(m_appIDuint, data.m_messageType, data.m_messageCounter, data.m_message, data.m_time);
+                        sndMsg(std::make_shared<flexd::icl::ipc::FleXdIPCMsg>(data.m_messageType, sendStream.releaseData()));
+                        guard.unlock();
                         m_logBuffer->pop();
+                    } else {
+                        guard.unlock();
+                        break;
                     }
                 }
             }
+            // mutex is unlocked when guard goes out of scope
         }
 
         void FleXdLoggerIPCClient::rcvMsg(pSharedFleXdIPCMsg msg, int fd) {
@@ -94,7 +102,7 @@ namespace flexd {
                             flushBuffer();
                             break;
                         case MsgType::Enum::HANDSHAKEFAIL:
-			    std::cout << "FleXdLogger::[" << m_appName << "][" << m_appIDuint << "][HandshakeFail] : " << "Handshake failure. This Name is using" << std::endl;
+                            std::cout << "FleXdLogger::[" << m_appName << "][" << m_appIDuint << "][HandshakeFail] : " << "Handshake failure. This Name is using" << std::endl;
                             m_connectionToServer = false;
                             break;
                         case MsgType::SETLOGLEVEL://TODO  setting of loglevel

@@ -43,20 +43,23 @@ namespace flexd {
         }
 
         uint32_t FleXdLogBuffer::getSizeBuffer() {
+            if (m_queue.empty()) {
+                m_sizeBuffer = 0;
+            }
             return m_sizeBuffer;
         }
 
-        const LogData* FleXdLogBuffer::getData() const {
-            if (m_sizeBuffer > 0) {
-               return &m_queue.front();
-            }
-            return nullptr;
+        const LogData& FleXdLogBuffer::front() const {
+            return m_queue.front();
         }
 
         bool FleXdLogBuffer::pop() {
             std::lock_guard<std::mutex> bufferLock(m_mutex);
+            if (m_queue.empty()) {
+                m_sizeBuffer = 0;
+            }
             if (m_sizeBuffer > 0) {
-                m_sizeBuffer -= m_queue.front().message.size();
+                m_sizeBuffer -= m_queue.front().m_message.size();
                 m_queue.pop();
                 return true;
             }
@@ -65,14 +68,18 @@ namespace flexd {
 
         bool FleXdLogBuffer::push(LogData&& logData) {
             std::lock_guard<std::mutex> bufferLock(m_mutex);
-            m_sizeBuffer += logData.message.size();// TODO getMessageLength return only size of payload without the header
+            m_sizeBuffer += logData.m_message.size();// TODO getMessageLength return only size of payload without the header
             if (m_sizeBuffer < m_maxSizeBuffer){
                 m_queue.push(std::move(logData));
                 return true;
             } else {
-                m_sizeBuffer -= logData.message.size();
+                m_sizeBuffer -= logData.m_message.size();
             }
             return false;
+        }
+
+        std::unique_lock<std::mutex> FleXdLogBuffer::getLock() {
+            return std::unique_lock<std::mutex>(m_mutex, std::defer_lock);
         }
 
     } // namespace FlexLogger

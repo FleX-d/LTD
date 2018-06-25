@@ -57,7 +57,7 @@ namespace flexd {
             void setName(std::string name);
             std::string getName()const;
             uint16_t getAppID()const;
-	    MsgType::Enum getLogLvlFilter();
+            MsgType::Enum getLogLvlFilter();
             bool isConnected();
 
             void flushBuffer();
@@ -71,7 +71,7 @@ namespace flexd {
             bool m_connectionToServer;
             std::string m_appName;
             uint16_t m_appIDuint;
-	    MsgType::Enum m_flexLogLevel;
+            MsgType::Enum m_flexLogLevel;
             std::shared_ptr<FleXdLogBuffer> m_logBuffer;
         };
 

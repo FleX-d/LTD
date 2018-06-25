@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ## [0.0.1] - 2018-06-21
 ### Added
+- Constructors and operators for structure LogData [Martin Strenger]
+- New functions front() and getLock() for class FleXdLogBuffer [Martin Strenger]
+
+### Changed
+- Fixed crashing of function flushBuffer() in class FleXdLoggerIPCClient [Martin Strenger]
+
+### Removed
+- Deleted function getData() from class FleXdLogBuffer [Martin Strenger]
+
+## [0.0.1] - 2018-06-21
+### Added
 - None
 
 ### Changed
