@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [0.0.1] - 2018-07-02
+### Added
+- None
+
+### Changed
+- Fixed crash when FLEX_LOG_INIT was not called [Martin Strenger]
+- Code update regarding changes in ICL library [Martin Strenger]
+
+### Removed
+- None
+
 ## [0.0.1] - 2018-06-21
 ### Added
 - Constructors and operators for structure LogData [Martin Strenger]

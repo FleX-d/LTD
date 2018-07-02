@@ -112,19 +112,20 @@ namespace flexd {
         }
 
         void FleXdLogger::writeLog(LogLevel::Enum logLevel, std::time_t time, const std::string& level, const std::string& stream) {
-            if(msgTypeToLogLevel(m_IPCClient->getLogLvlFilter()) <= logLevel){
+            if(m_IPCClient && msgTypeToLogLevel(m_IPCClient->getLogLvlFilter()) <= logLevel){
                 writeLogToBuffer(logLevel, stream, time);
-                if (m_IPCClient && !m_IPCClient->isConnected()) {
+                if (!m_IPCClient->isConnected()) {
                 std::cout << "FleXdLogger::[" << m_IPCClient->getName() << "][" << m_IPCClient->getAppID() << "][" << time <<"][" << level << "] : " << stream << std::endl;
                 }
             }
         }
 
         void FleXdLogger::writeLogToBuffer(const LogLevel::Enum logLevel, const std::string& stream, time_t time) {
+            if(m_logBuffer) {
                 m_logBuffer->push(LogData(time, logLevelToMsgType(logLevel), m_msgCount, stream));
                 m_msgCount++;
                 if (m_IPCClient) m_IPCClient->flushBuffer();
-
+            }
         }
 
         void FleXdLogger::handshake() {
