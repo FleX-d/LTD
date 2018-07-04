@@ -96,7 +96,7 @@ namespace flexd {
             }
 
             std::cout << "[" << appName << "]" << "[" << std::to_string(timeVal) << "]" << "[" << priority << "] : " << message << std::endl;
-            syslog(sysLogType,"[%s][%lud][%s] %s ",
+            syslog(sysLogType,"[%s][%lu][%s] %s ",
                     appName.c_str(), timeVal, priority.c_str(), message.c_str());
         }
 

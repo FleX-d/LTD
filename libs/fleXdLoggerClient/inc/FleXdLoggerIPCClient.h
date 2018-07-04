@@ -52,7 +52,7 @@ namespace flexd {
 
             virtual void rcvMsg(flexd::icl::ipc::pSharedFleXdIPCMsg msg, int fd = 0) override;
             void onConnect(bool ret);
-            void onDisconnect(bool ret);
+            void onDisconnect(int ret);
 
             void setName(std::string name);
             std::string getName()const;

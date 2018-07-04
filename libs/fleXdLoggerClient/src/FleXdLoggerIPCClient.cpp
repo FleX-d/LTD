@@ -46,7 +46,7 @@ namespace flexd {
           m_flexLogLevel(MsgType::Enum::VERBOSE),
           m_logBuffer(logBuffer) {
             this->setOnConnect([this](bool ret){ this->onConnect(ret); });
-            this->setOnDisconnect([this](bool ret){ this->onDisconnect(ret); });
+            this->setOnDisconnect([this](int ret){ this->onDisconnect(ret); });
         }
 
         void FleXdLoggerIPCClient::setName(std::string name) {
@@ -120,7 +120,7 @@ namespace flexd {
             //TODO
         }
 
-        void FleXdLoggerIPCClient::onDisconnect(bool ret) {
+        void FleXdLoggerIPCClient::onDisconnect(int ret) {
             m_connectionToServer = false;
         }
 

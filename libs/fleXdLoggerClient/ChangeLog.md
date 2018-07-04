@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [0.0.1] - 2018-07-04
+### Added
+- None
+
+### Changed
+- Implementation of ICL changes [Jakub Pekar]
+
+### Removed
+
 ## [0.0.1] - 2018-06-21
 ### Added
 - Constructors and operators for structure LogData [Martin Strenger]
