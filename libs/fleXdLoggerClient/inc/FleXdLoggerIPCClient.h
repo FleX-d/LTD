@@ -51,8 +51,8 @@ namespace flexd {
             virtual ~FleXdLoggerIPCClient() = default;
 
             virtual void rcvMsg(flexd::icl::ipc::pSharedFleXdIPCMsg msg, int fd = 0) override;
-            void onConnect(bool ret, int fd);
-            void onDisconnect(bool ret, int fd);
+            virtual void onConnect(bool ret) override;
+            virtual void onDisconnect(int fd) override;
 
             void setName(std::string name);
             std::string getName()const;
