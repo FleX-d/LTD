@@ -31,16 +31,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Created on May 23, 2018, 3:54 PM
  */
 
-#include <iostream>
 #include "FleXdLoggerIPCClient.h"
+#include <iostream>
 
 using namespace flexd::icl::ipc;
 namespace flexd {
     namespace logger {
-
         FleXdLoggerIPCClient::FleXdLoggerIPCClient(std::shared_ptr<FleXdLogBuffer> logBuffer, flexd::icl::ipc::FleXdEpoll& poller)
         : FleXdIPCProxyBuilder<FleXdUDSClient>("/tmp/FleXd/shared/ipc/uds/fleXdLogger.soc", poller),
-          m_connectionToServer(false),
+          m_conectionState(ConnectionState::Enum::DISCONNECT),
           m_appName(""),
           m_appIDuint(0),
           m_flexLogLevel(MsgType::Enum::VERBOSE),
@@ -64,13 +63,17 @@ namespace flexd {
         MsgType::Enum FleXdLoggerIPCClient::getLogLvlFilter(){
             return m_flexLogLevel;
         }
-
-        bool FleXdLoggerIPCClient::isConnected() {
-            return m_connectionToServer;
+        
+        void FleXdLoggerIPCClient::setConnectionState(ConnectionState::Enum state) {
+            m_conectionState = state;
+        }
+        
+        ConnectionState::Enum FleXdLoggerIPCClient::getConnectionState() const {
+            return m_conectionState;
         }
 
         void FleXdLoggerIPCClient::flushBuffer() {
-            if (m_appIDuint != 0 && m_connectionToServer && m_logBuffer) {
+            if (m_appIDuint != 0 && m_logBuffer) {
                 auto guard = m_logBuffer->getLock();
                 while (true) {
                     guard.lock();
@@ -88,7 +91,7 @@ namespace flexd {
             }
             // mutex is unlocked when guard goes out of scope
         }
-
+        
         void FleXdLoggerIPCClient::rcvMsg(pSharedFleXdIPCMsg msg, int fd) {
             if (msg) {
                 if (!msg->getHeaderParamType()) {
@@ -97,13 +100,13 @@ namespace flexd {
                     FleXdLogStream recvMsg(msg->releasePayload());
                     switch (msgType) {
                         case MsgType::Enum::HANDSHAKESUCCES:
-                            m_connectionToServer = true;
+                            m_conectionState = ConnectionState::Enum::CONNECTED;
                             m_appIDuint = recvMsg.getAppID();
                             flushBuffer();
                             break;
                         case MsgType::Enum::HANDSHAKEFAIL:
                             std::cout << "FleXdLogger::[" << m_appName << "][" << m_appIDuint << "][HandshakeFail] : " << "Handshake failure. This Name is using" << std::endl;
-                            m_connectionToServer = false;
+                            m_conectionState = ConnectionState::Enum::HANDSHAKEFAILNAME;
                             break;
                         case MsgType::SETLOGLEVEL://TODO  setting of loglevel
                             ;
@@ -115,13 +118,21 @@ namespace flexd {
                 }
             }
         }
+        
+        void FleXdLoggerIPCClient::handshake() {
+                m_conectionState = ConnectionState::Enum::HANDSHAKEPROCESS;
+                FleXdLogStream handshakeMessage(
+                                            0, flexd::logger::MsgType::HANDSHAKE, 0, getName(),
+                                            (uint64_t) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+                sndMsg(std::make_shared<flexd::icl::ipc::FleXdIPCMsg>(flexd::logger::MsgType::HANDSHAKE, std::move(handshakeMessage.releaseData())));
+        }
 
         void FleXdLoggerIPCClient::onConnect(bool ret) {
             //TODO
         }
 
         void FleXdLoggerIPCClient::onDisconnect(int fd) {
-            m_connectionToServer = false;
+            m_conectionState = ConnectionState::Enum::DISCONNECT;
         }
 
     } // namespace logger

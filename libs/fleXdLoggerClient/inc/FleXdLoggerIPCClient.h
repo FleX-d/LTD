@@ -36,15 +36,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "FleXdMessageType.h"
 #include "FleXdLogBuffer.h"
-#include <string>
 #include <FleXdEpoll.h>
 #include <FleXdIPCProxyBuilder.h>
 #include <FleXdIPCMsg.h>
 #include <FleXdUDSClient.h>
+#include <string>
 
 namespace flexd {
     namespace logger {
-
+        
+        namespace ConnectionState{
+           enum Enum{
+               INITIALIZATIONSUCCESS = 0X00,
+               HANDSHAKEPROCESS,
+               CONNECTED,
+               //...
+               DISCONNECT = 0x10,
+               HANDSHAKEFAILNAME
+            }; 
+        } // namespace StateConnection
+        
         class FleXdLoggerIPCClient : public flexd::icl::ipc::FleXdIPCProxyBuilder<flexd::icl::ipc::FleXdUDSClient> {
         public:
             FleXdLoggerIPCClient(std::shared_ptr<FleXdLogBuffer> logBuffer, flexd::icl::ipc::FleXdEpoll& poller);
@@ -58,17 +69,16 @@ namespace flexd {
             std::string getName()const;
             uint16_t getAppID()const;
             MsgType::Enum getLogLvlFilter();
-            bool isConnected();
+            void setConnectionState(ConnectionState::Enum state);
+            ConnectionState::Enum getConnectionState() const;
 
             void flushBuffer();
-
+            void handshake();
+            
             FleXdLoggerIPCClient(const FleXdLoggerIPCClient&) = delete;
 
         private:
-            bool handshake();
-
-        private:
-            bool m_connectionToServer;
+            ConnectionState::Enum m_conectionState;
             std::string m_appName;
             uint16_t m_appIDuint;
             MsgType::Enum m_flexLogLevel;

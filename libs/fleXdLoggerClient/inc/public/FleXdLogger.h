@@ -137,11 +137,10 @@ namespace flexd {
             void initLogger();
             void writeLog(LogLevel::Enum logLevel, std::time_t time, const std::string& level, const std::string& stream);
             void writeLogToBuffer(const LogLevel::Enum logLevel, const std::string& stream, std::time_t time);
-            void handshake();
 
         private:
-            bool m_connectionToServer;
             std::string m_appName;
+            std::string m_logPrefix;
             uint16_t m_appIDuint;
             std::shared_ptr<FleXdLogBuffer> m_logBuffer;
             std::unique_ptr<FleXdLoggerIPCClient> m_IPCClient;

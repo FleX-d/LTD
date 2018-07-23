@@ -33,6 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FleXdLogStream.h"
 #include "FleXdMessageType.h"
 #include "FleXdLoggerIPCClient.h"
+#include "FleXdIPCCommon.h"
+
+#define UDS_PATH "/tmp/FleXd/shared/ipc/uds/fleXdLogger.soc"
+#define LOG_PREFIX "FleXdLogger"
 
 namespace {
 
@@ -81,8 +85,8 @@ namespace flexd {
     namespace logger {
 
         FleXdLogger::FleXdLogger()
-        : m_connectionToServer(false),
-          m_appName(""),
+         :m_appName(""),
+          m_logPrefix(LOG_PREFIX),
           m_appIDuint(0),
           m_logBuffer(new FleXdLogBuffer(FLEXDLOGGER_MAXLOGBUFFERSIZE)),
           m_IPCClient(nullptr),
@@ -102,21 +106,47 @@ namespace flexd {
             m_IPCClient = std::make_unique<FleXdLoggerIPCClient>(m_logBuffer, poller);
             m_IPCClient->setName(appName);
             if (m_IPCClient->init()) {
-                handshake();
+                m_IPCClient->setConnectionState(ConnectionState::Enum::INITIALIZATIONSUCCESS);
+                m_IPCClient->handshake();
                 return true;
             } else {
-                //TODO
-                std::cout << "FleXdLogger::loggerInit() failed" << std::endl;
+                m_IPCClient->setConnectionState(ConnectionState::Enum::DISCONNECT);
+                std::cout << m_logPrefix << "::loggerInit() failed." << std::endl;
             }
             return false;
         }
 
         void FleXdLogger::writeLog(LogLevel::Enum logLevel, std::time_t time, const std::string& level, const std::string& stream) {
             if(m_IPCClient && msgTypeToLogLevel(m_IPCClient->getLogLvlFilter()) <= logLevel){
-                writeLogToBuffer(logLevel, stream, time);
-                if (!m_IPCClient->isConnected()) {
-                std::cout << "FleXdLogger::[" << m_IPCClient->getName() << "][" << m_IPCClient->getAppID() << "][" << time <<"][" << level << "] : " << stream << std::endl;
+                switch(m_IPCClient->getConnectionState()){
+                    case ConnectionState::Enum::CONNECTED:
+                        writeLogToBuffer(logLevel, stream, time);
+                        m_IPCClient->flushBuffer();
+                        break;
+                        
+                    case ConnectionState::Enum::DISCONNECT:
+                        if (flexd::icl::ipc::checkIfFileExist(UDS_PATH) ) {
+                            if(m_IPCClient->init()) {
+                                m_IPCClient->handshake();
+                                m_logPrefix = std::string(LOG_PREFIX) + "(HSProcess)";
+                                break;
+                            } 
+                        } 
+                        m_logPrefix = std::string(LOG_PREFIX) + "(ServerDisconnected)";
+                        break;
+                    case ConnectionState::Enum::HANDSHAKEFAILNAME:
+                        m_logPrefix = std::string(LOG_PREFIX) + "(HSFailName)";
+                        break;
+                    default:
+                        m_logPrefix = std::string(LOG_PREFIX) + "(UNDEFINE State)";
                 }
+                
+                
+                if (m_IPCClient->getConnectionState() != ConnectionState::Enum::CONNECTED) {
+                    writeLogToBuffer(logLevel, stream, time); 
+                    std::cout << m_logPrefix << "::[" << m_IPCClient->getName() << "][" << m_IPCClient->getAppID() << "][" << time <<"][" << level << "] : " << stream << std::endl;
+                }
+                
             }
         }
 
@@ -124,19 +154,8 @@ namespace flexd {
             if(m_logBuffer) {
                 m_logBuffer->push(LogData(time, logLevelToMsgType(logLevel), m_msgCount, stream));
                 m_msgCount++;
-                if (m_IPCClient) m_IPCClient->flushBuffer();
             }
         }
-
-        void FleXdLogger::handshake() {
-            if (m_IPCClient) {
-                FleXdLogStream handshakeMessage(
-                    0, flexd::logger::MsgType::HANDSHAKE, 0, m_IPCClient->getName(),
-                    (uint64_t) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
-                m_IPCClient->sndMsg(std::make_shared<flexd::icl::ipc::FleXdIPCMsg>(flexd::logger::MsgType::HANDSHAKE, std::move(handshakeMessage.releaseData())));
-            }
-        }
-
     } // namespace FlexLogger
 } // namespace flexd
 

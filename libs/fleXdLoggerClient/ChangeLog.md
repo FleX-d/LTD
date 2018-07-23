@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [0.0.1] - 2018-07-23
+### Added
+- Enum of ICL connection state into the FleXdLoggerIPCClient class - header file [Jakub Pekar]
+
+### Changed
+- Reconnection of logger client after server crashing and restarting [Jakub Pekar]
+- Handshake method replaced from FleXdLogger into FleXdLoggerIPCClient class [Jakub Pekar]
+
+### Removed
+- Boolean attributes from FleXdLogger and FleXdLoggerIPCClient [Jakub Pekar]
+
 ## [0.0.1] - 2018-07-11
 ### Added
 - None

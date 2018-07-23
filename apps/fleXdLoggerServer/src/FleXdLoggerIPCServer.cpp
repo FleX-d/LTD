@@ -76,7 +76,7 @@ namespace flexd {
                     FleXdLogStream ackMessage((uint16_t) appId, (uint8_t) MsgType::Enum::HANDSHAKESUCCES, 0, std::to_string(appId));
                     /*std::cout << "*ACK-"<< hsMsg.getMessage() <<  "* -> ";
                     ackMessage.logToCout();*/
-		    m_logging(ackMessage);
+                    m_logging(ackMessage);
 
                     auto sendingIPCLog = std::make_shared<FleXdIPCMsg>((uint8_t) MsgType::Enum::HANDSHAKESUCCES, std::move(ackMessage.releaseData()));
                     this->sndMsg(sendingIPCLog, fd);
