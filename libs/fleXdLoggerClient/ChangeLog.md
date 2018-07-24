@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 
 ## [0.0.1] - 2018-07-23
 ### Added
+- None
+
+### Changed
+- Editing of unit tests [Jakub Pekar]
+
+### Removed
+- None
+
+## [0.0.1] - 2018-07-23
+### Added
 - Enum of ICL connection state into the FleXdLoggerIPCClient class - header file [Jakub Pekar]
 
 ### Changed

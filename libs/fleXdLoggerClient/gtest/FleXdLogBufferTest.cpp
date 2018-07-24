@@ -50,12 +50,12 @@ namespace {
 
     TEST(ClientBuffer,getStreamFromTheBuffer_comparingOfStream){
         std::string log("This is log message");
-        const flexd::logger::LogData* data = clientBuffer.getData();
+        const flexd::logger::LogData data = clientBuffer.front();
 
-        EXPECT_EQ(data->time, 15151515000);
-        EXPECT_EQ(data->messageType, flexd::logger::MsgType::Enum::ERROR);
-        EXPECT_EQ(data->messageCounter, 128);
-        EXPECT_EQ(data->message, log);
+        EXPECT_EQ(data.m_time, 15151515000);
+        EXPECT_EQ(data.m_messageType, flexd::logger::MsgType::Enum::ERROR);
+        EXPECT_EQ(data.m_messageCounter, 128);
+        EXPECT_EQ(data.m_message, log);
     }
 
     TEST(CLientBuffer,removeStreamFromBuffer){

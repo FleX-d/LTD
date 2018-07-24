@@ -33,6 +33,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <gtest/gtest.h>
 #include "FleXdLogger.h"
+#include "FleXdLoggerIPCClient.h"
+#include "FleXdEpoll.h"
 
+using namespace flexd::logger;
 namespace{
+    flexd::icl::ipc::FleXdEpoll poller(10);
+    
+    TEST(FlexdLogger_and_IPC, InitializationWithoutTheServer){
+        EXPECT_FALSE(FleXdLogger::instance().loggerInit(poller, "Test"));
+    }
+    
+    
+    
 }

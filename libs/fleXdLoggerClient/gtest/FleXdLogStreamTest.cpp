@@ -37,21 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     std::string testLog("This is log message");
     flexd::logger::FleXdLogStream stream(32, flexd::logger::MsgType::Enum::ERROR, 128, testLog, 15151515000);
 
-
-//         std::string log("This is LOG from application");
-//     /*                                  appID,msgType,msgCounter,logMessage  */
-//     flexd::logger::FleXdLogMessage logmessage(10,4,11,log);
-//
-//     TEST(LogMessage, getFunctions) {
-//         EXPECT_EQ(10,logmessage.getAppID());
-//         EXPECT_NE(0,logmessage.getTime());
-//         EXPECT_EQ(4,logmessage.getMsgType());
-//         EXPECT_EQ(11,logmessage.getMsgCounter());
-//         EXPECT_EQ(log.size(),logmessage.getMsgSize());
-//         EXPECT_EQ(log,logmessage.getLogMessage());
-//     }
-
-
 namespace{
     TEST(LogStream, testGetAppID){
         EXPECT_EQ(stream.getAppID(), 32);
