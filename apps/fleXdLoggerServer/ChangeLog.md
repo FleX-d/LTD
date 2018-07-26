@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [0.0.1] - 2018-07-26
+### Added
+- None
+
+### Changed
+- Updated unit tests and examples [Martin Strenger]
+
+### Removed
+- None
+
 ## [0.0.1] - 2018-06-21
 ### Added
 - None

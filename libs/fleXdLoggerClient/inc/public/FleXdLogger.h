@@ -50,9 +50,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FLEX_LOG_FATAL(...)  \
     flexd::logger::FleXdLogger::instance().log(flexd::logger::LogLevel::Enum::FATAL, "fatal", std::this_thread::get_id(), std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), __VA_ARGS__)
 #define FLEX_LOG_INIT( ...)  \
-    flexd::logger::FleXdLogger::instance().loggerInit(__VA_ARGS__);
-#define FLEX_START_LOOP(...) \
-    flexd::logger::FleXdLogger::instance().runLoop(__VA_ARGS__);
+    flexd::logger::FleXdLogger::instance().loggerInit(__VA_ARGS__)
+#define FLEX_LOG_UNINIT()  \
+    flexd::logger::FleXdLogger::instance().loggerUninit()
 
 #define FLEXDLOGGER_MAXLOGBUFFERSIZE 2048
 
@@ -117,7 +117,6 @@ namespace flexd {
         }
 
         class FleXdLogger {
-
         public:
             ~FleXdLogger();
             static FleXdLogger& instance();
@@ -129,12 +128,12 @@ namespace flexd {
                 writeLog(logLevel, time, level, ss.str());
             }
             bool loggerInit(flexd::icl::ipc::FleXdEpoll& poller, const std::string& appID);
+            void loggerUninit();
             FleXdLogger(FleXdLogger const&) = delete;
             void operator=(FleXdLogger const&) = delete;
 
         private:
             FleXdLogger();
-            void initLogger();
             void writeLog(LogLevel::Enum logLevel, std::time_t time, const std::string& level, const std::string& stream);
             void writeLogToBuffer(const LogLevel::Enum logLevel, const std::string& stream, std::time_t time);
 

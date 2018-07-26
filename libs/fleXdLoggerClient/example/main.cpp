@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cstdlib>
 #include <FleXdLogger.h>
 #include <FleXdEpoll.h>
+#include <FleXdEvent.h>
 #include <unistd.h>
 
 using namespace std;
@@ -41,23 +42,23 @@ using namespace std;
  *
  */
 int main(int argc, char** argv) {
-
     flexd::icl::ipc::FleXdEpoll poller(10);
+    flexd::icl::ipc::FleXdTermEvent event(poller);
     std::string appname = "TestApp";
     if (argc > 1){
         appname = std::string(argv[1]);
     }
-    bool init = FLEX_LOG_INIT(poller, appname)
-
+    bool init = FLEX_LOG_INIT(poller, appname);
     FLEX_LOG_DEBUG(" -> first log - This is debug log.");
     FLEX_LOG_INFO(" -> second log - This is info log.");
     FLEX_LOG_FATAL(" -> third log - This is fatal error log. This is very big problem.");
     FLEX_LOG_ERROR(" -> fourth log - This is error log.");
 
-    if (init)
+    if (event.init() && init)
     {
         poller.loop();
     }
+    FLEX_LOG_UNINIT();
     return 0;
 }
 

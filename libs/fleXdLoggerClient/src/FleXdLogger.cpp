@@ -116,6 +116,10 @@ namespace flexd {
             return false;
         }
 
+        void FleXdLogger::loggerUninit() {
+            m_IPCClient.release();
+        }
+
         void FleXdLogger::writeLog(LogLevel::Enum logLevel, std::time_t time, const std::string& level, const std::string& stream) {
             if(m_IPCClient && msgTypeToLogLevel(m_IPCClient->getLogLvlFilter()) <= logLevel){
                 switch(m_IPCClient->getConnectionState()){
@@ -123,15 +127,15 @@ namespace flexd {
                         writeLogToBuffer(logLevel, stream, time);
                         m_IPCClient->flushBuffer();
                         break;
-                        
+
                     case ConnectionState::Enum::DISCONNECT:
                         if (flexd::icl::ipc::checkIfFileExist(UDS_PATH) ) {
                             if(m_IPCClient->init()) {
                                 m_IPCClient->handshake();
                                 m_logPrefix = std::string(LOG_PREFIX) + "(HSProcess)";
                                 break;
-                            } 
-                        } 
+                            }
+                        }
                         m_logPrefix = std::string(LOG_PREFIX) + "(ServerDisconnected)";
                         break;
                     case ConnectionState::Enum::HANDSHAKEFAILNAME:
@@ -140,13 +144,13 @@ namespace flexd {
                     default:
                         m_logPrefix = std::string(LOG_PREFIX) + "(UNDEFINE State)";
                 }
-                
-                
+
+
                 if (m_IPCClient->getConnectionState() != ConnectionState::Enum::CONNECTED) {
-                    writeLogToBuffer(logLevel, stream, time); 
+                    writeLogToBuffer(logLevel, stream, time);
                     std::cout << m_logPrefix << "::[" << m_IPCClient->getName() << "][" << m_IPCClient->getAppID() << "][" << time <<"][" << level << "] : " << stream << std::endl;
                 }
-                
+
             }
         }
 

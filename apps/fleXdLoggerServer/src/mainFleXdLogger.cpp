@@ -31,16 +31,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <signal.h>
 #include <memory>
 #include "FleXdLoggerServer.h"
-#include "FleXdEpoll.h"
-#include "FleXdEvent.h"
+#include <FleXdEpoll.h>
+#include <FleXdEvent.h>
 
 #define CMD_LOG_TO_DLT "-dlt"
 
 int main(int argc, char** argv) {
+    flexd::icl::ipc::FleXdEpoll poller(10); //TODO max number of events
+    flexd::icl::ipc::FleXdTermEvent termEvent(poller);
     std::unique_ptr<flexd::logger::FleXdLoggerServer> loggerServer;
     bool logTodlt = false;
     bool argError = false;
-
 
     for (int i = 1; i < argc; ++i) { // Remember argv[0] is the path to the program, we want from argv[1] onwards
         // TODO: Check argument duplicity
@@ -60,11 +61,7 @@ int main(int argc, char** argv) {
         std::cerr << "Usage: " << argv[0] << " [" CMD_LOG_TO_DLT "]" << std::endl;
         return 1;
     }
-
     // Create server
-    flexd::icl::ipc::FleXdEpoll poller(10); //TODO max number of events
-    flexd::icl::ipc::FleXdTermEvent termEvent(poller);
-
     if (termEvent.init()) {
         loggerServer = std::make_unique<flexd::logger::FleXdLoggerServer>(poller, logTodlt);
         poller.loop();

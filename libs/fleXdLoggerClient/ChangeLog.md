@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [0.0.1] - 2018-07-26
+### Added
+- New macro FLEX_LOG_UNINIT [Martin Strenger]
+
+### Changed
+- Updated unit tests and examples [Martin Strenger]
+
+### Removed
+- Removed semicolons from the end of macro definitions [Martin Strenger]
+- Removed unused macros and functions [Martin Strenger]
 
 ## [0.0.1] - 2018-07-23
 ### Added

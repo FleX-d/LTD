@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FleXdLoggerServer.h"
 
 // Create server
-flexd::icl::ipc::FleXdEpoll poller(10);
-flexd::logger::FleXdLoggerServer logger(poller, false);
+flexd::icl::ipc::FleXdEpoll pollerDummy(10);
+flexd::logger::FleXdLoggerServer logger(pollerDummy, false);
 
 //TODO test for this class when IPC communication will be implement
