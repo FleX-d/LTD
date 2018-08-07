@@ -2,6 +2,21 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [0.0.1] - 2018-08-07
+### Added
+- None
+
+### Changed
+- Repairing syslog print lld for time value [Jakub Pekar]
+
+### Removed
+- None
+
+## [0.0.1] - 2018-06-21
+### Added
+- None
+
 ## [0.0.1] - 2018-07-26
 ### Added
 - None

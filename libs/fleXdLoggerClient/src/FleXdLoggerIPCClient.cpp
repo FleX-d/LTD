@@ -112,7 +112,7 @@ namespace flexd {
                             ;
                             break;
                         default:
-                            ;
+                            m_conectionState = ConnectionState::Enum::DISCONNECT;
                             break;
                     }
                 }
